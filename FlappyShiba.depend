@@ -1,7 +1,8 @@
 # depslib dependency file v1.0
-1742268575 source:e:\codeblock\flappyshiba\main.cpp
+1742272051 source:e:\codeblock\flappyshiba\main.cpp
 	"AudioManager.h"
 	<SDL.h>
+	<iostream>
 
 1740149091 c:\users\admin\downloads\sdl2-devel-2.32.0-mingw\sdl2-2.32.0\x86_64-w64-mingw32\include\sdl2\sdl.h
 	"SDL_main.h"
@@ -451,7 +452,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1742269548 source:e:\codeblock\flappyshiba\audiomanager.cpp
+1742271614 source:e:\codeblock\flappyshiba\audiomanager.cpp
 	<iostream>
 	"AudioManager.h"
 
