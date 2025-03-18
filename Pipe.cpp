@@ -6,7 +6,7 @@
 
 Pipe::Pipe(int x, SDL_Renderer* renderer)
 {
-    int height = rand() % (SCEEN_HEIGHT - PIPE_GAP - 100) + 50;
+    int height = rand() % (SCREEN_HEIGHT - PIPE_GAP - 100) + 50;
     upperRect = {x, 0, 100, height};
     lowerRect = {x, height + PIPE_GAP, 100, SCREEN_HEIGHT - height - PIPE_GAP};
     passed = false;

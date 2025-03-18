@@ -1,7 +1,7 @@
 #include <iostream>
 #include <SDL_image.h>
-#include <Bomb.h>
-#include <Constants.h>
+#include "Bomb.h"
+#include "Constants.h"
 
 Bomb::Bomb(int x, int y, SDL_Renderer* renderer)
 {

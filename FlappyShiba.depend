@@ -1,6 +1,7 @@
 # depslib dependency file v1.0
-1742093284 source:e:\codeblock\flappyshiba\main.cpp
-	"Game.h"
+1742268575 source:e:\codeblock\flappyshiba\main.cpp
+	"AudioManager.h"
+	<SDL.h>
 
 1740149091 c:\users\admin\downloads\sdl2-devel-2.32.0-mingw\sdl2-2.32.0\x86_64-w64-mingw32\include\sdl2\sdl.h
 	"SDL_main.h"
@@ -450,34 +451,34 @@
 	"begin_code.h"
 	"close_code.h"
 
-1742093283 source:e:\codeblock\flappyshiba\audiomanager.cpp
-	"AudioManager.h"
+1742269548 source:e:\codeblock\flappyshiba\audiomanager.cpp
 	<iostream>
+	"AudioManager.h"
 
-1742093284 source:e:\codeblock\flappyshiba\bird.cpp
+1742227298 source:e:\codeblock\flappyshiba\bird.cpp
+	<iostream>
+	<SDL_image.h>
 	"Bird.h"
 	"Constants.h"
 
-1742093283 source:e:\codeblock\flappyshiba\bomb.cpp
+1742265248 source:e:\codeblock\flappyshiba\bomb.cpp
+	<iostream>
+	<SDL_image.h>
 	"Bomb.h"
 	"Constants.h"
 
-1742093284 source:e:\codeblock\flappyshiba\game.cpp
-	"Game.h"
-	"Constants.h"
+1742102257 source:e:\codeblock\flappyshiba\game.cpp
+
+1742265425 source:e:\codeblock\flappyshiba\pipe.cpp
 	<SDL_image.h>
 	<iostream>
-
-1742093284 source:e:\codeblock\flappyshiba\pipe.cpp
+	<cstdlib>
 	"Pipe.h"
 	"Constants.h"
 
-1742093284 source:e:\codeblock\flappyshiba\screen.cpp
-	"Screen.h"
-	<SDL_image.h>
-	<iostream>
+1742102250 source:e:\codeblock\flappyshiba\screen.cpp
 
-1742093283 e:\codeblock\flappyshiba\audiomanager.h
+1742261684 e:\codeblock\flappyshiba\audiomanager.h
 	<SDL_mixer.h>
 
 1738962281 c:\users\admin\downloads\sdl2_mixer-devel-2.8.1-mingw\sdl2_mixer-2.8.1\x86_64-w64-mingw32\include\sdl2\sdl_mixer.h
@@ -489,12 +490,12 @@
 	"begin_code.h"
 	"close_code.h"
 
-1742093283 e:\codeblock\flappyshiba\bird.h
+1742226181 e:\codeblock\flappyshiba\bird.h
 	<SDL.h>
 
-1742093284 e:\codeblock\flappyshiba\constants.h
+1742121568 e:\codeblock\flappyshiba\constants.h
 
-1742093283 e:\codeblock\flappyshiba\bomb.h
+1742180961 e:\codeblock\flappyshiba\bomb.h
 	<SDL.h>
 
 1742093283 e:\codeblock\flappyshiba\game.h
@@ -506,7 +507,7 @@
 	"AudioManager.h"
 	"Screen.h"
 
-1742093283 e:\codeblock\flappyshiba\pipe.h
+1742126502 e:\codeblock\flappyshiba\pipe.h
 	<SDL.h>
 
 1742093283 e:\codeblock\flappyshiba\screen.h
