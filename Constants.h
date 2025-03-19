@@ -3,7 +3,7 @@
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
-const int GRAVITY = 2;
+const int GRAVITY = 0.9;
 const int JUMP_FORCE = -10;
 const int PIPE_SPEED = 3;
 const int PIPE_GAP = 200;

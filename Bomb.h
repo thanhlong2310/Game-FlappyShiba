@@ -1,5 +1,5 @@
 #ifndef BOMB_H
-#define BOMH_H
+#define BOMB_H
 #include <SDL.h>
 
 class Bomb
