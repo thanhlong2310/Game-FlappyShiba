@@ -6,7 +6,7 @@ class Bird
 {
 public:
     SDL_Rect rect;
-    int velocity;
+    float velocity;
     SDL_Texture* texture;
     Bird(SDL_Renderer* renderer);
     void update();

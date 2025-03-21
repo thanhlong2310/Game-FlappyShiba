@@ -6,7 +6,7 @@
 Bird::Bird(SDL_Renderer* renderer)
 {
     rect = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2, 50, 50};
-    velocity = 0;
+    velocity = 0.0f;
     SDL_Surface* surface = IMG_Load("assets/shiba.png");
     if(!surface)
     {
