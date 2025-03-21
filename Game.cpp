@@ -14,6 +14,17 @@ Game::Game(SDL_Renderer* rend) : renderer(rend)
     score = 0;
     frameCount = 0;
     explodeTimer = 0;
+    SDL_Surface* bgSurface = IMG_Load("assets/background.png");
+    if (!bgSurface)
+    {
+        std::cout << "Failed to load background! SDL_image Error: " << IMG_GetError() << std::endl;
+    }
+    backgroundTexture = SDL_CreateTextureFromSurface(renderer, bgSurface);
+    SDL_FreeSurface(bgSurface);
+    if (!backgroundTexture)
+    {
+        std::cout << "Failed to create background texture! SDL_Error: " << SDL_GetError() << std::endl;
+    }
 }
 Game::~Game()
 {
@@ -23,12 +34,18 @@ Game::~Game()
     delete audioManager;
     delete startScreen;
     delete gameOverScreen;
+    SDL_DestroyTexture(backgroundTexture);
 }
 void Game::run()
 {
     audioManager->playBackgroundMusic();
+    const int FPS = 60;
+    const int frameDelay = 1000 / FPS;
+    Uint32 frameStart;
+    int frameTime;
     while (running)
     {
+        frameStart = SDL_GetTicks();
         handleEvents();
         update();
         render();
@@ -36,6 +53,11 @@ void Game::run()
         {
             SDL_Delay(1000);
             running = false;
+        }
+        frameTime = SDL_GetTicks() - frameStart;
+        if (frameDelay > frameTime)
+        {
+            SDL_Delay(frameDelay - frameTime);
         }
     }
     audioManager->stopBackgroundMusic();
@@ -103,11 +125,7 @@ void Game::render()
     }
     else
     {
-        SDL_Surface* bgSurface = IMG_Load("assets/background.png");
-        SDL_Texture* bgTexture = SDL_CreateTextureFromSurface(renderer, bgSurface);
-        SDL_RenderCopy(renderer, bgTexture, nullptr, nullptr);
-        SDL_FreeSurface(bgSurface);
-        SDL_DestroyTexture(bgTexture);
+        SDL_RenderCopy(renderer, backgroundTexture, nullptr, nullptr);
         bird->render(renderer);
         for (auto pipe : pipes) pipe->render(renderer);
         for (auto bomb : bombs) bomb->render(renderer);
@@ -130,8 +148,18 @@ void Game::spawnBomb()
 void Game::checkCollisions()
 {
     SDL_Rect birdRect = bird->rect;
+    birdRect.x += 17;
+    birdRect.y += 17;
+    birdRect.w -= 34;
+    birdRect.h -= 34;
     for (auto pipe : pipes)
     {
+        SDL_Rect upperRect = pipe->upperRect;
+        upperRect.x += 35;
+        upperRect.w -= 70;
+        SDL_Rect lowerRect = pipe->lowerRect;
+        lowerRect.x += 35;
+        lowerRect.w -= 70;
         if (SDL_HasIntersection(&birdRect, &pipe->upperRect) || SDL_HasIntersection(&birdRect, &pipe->lowerRect))
         {
             audioManager->playExplosionSound();
@@ -141,6 +169,11 @@ void Game::checkCollisions()
     }
     for (auto bomb : bombs)
     {
+        SDL_Rect bombRect = bomb->rect;
+        bombRect.x += 17;
+        bombRect.y += 17;
+        bombRect.w -= 34;
+        bombRect.h -= 34;
         if (SDL_HasIntersection(&birdRect, &bomb->rect))
         {
             audioManager->playExplosionSound();

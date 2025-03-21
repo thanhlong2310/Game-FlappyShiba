@@ -453,11 +453,11 @@
 	"begin_code.h"
 	"close_code.h"
 
-1742490768 source:e:\codeblock\flappyshiba\audiomanager.cpp
+1742541698 source:e:\codeblock\flappyshiba\audiomanager.cpp
 	<iostream>
 	"AudioManager.h"
 
-1742481281 source:e:\codeblock\flappyshiba\bird.cpp
+1742544567 source:e:\codeblock\flappyshiba\bird.cpp
 	<iostream>
 	<SDL_image.h>
 	"Bird.h"
@@ -469,12 +469,12 @@
 	"Bomb.h"
 	"Constants.h"
 
-1742483584 source:e:\codeblock\flappyshiba\game.cpp
+1742546760 source:e:\codeblock\flappyshiba\game.cpp
 	<iostream>
 	<SDL_image.h>
 	"Game.h"
 
-1742265425 source:e:\codeblock\flappyshiba\pipe.cpp
+1742544567 source:e:\codeblock\flappyshiba\pipe.cpp
 	<SDL_image.h>
 	<iostream>
 	<cstdlib>
@@ -502,12 +502,12 @@
 1742481265 e:\codeblock\flappyshiba\bird.h
 	<SDL.h>
 
-1742481934 e:\codeblock\flappyshiba\constants.h
+1742544567 e:\codeblock\flappyshiba\constants.h
 
 1742300048 e:\codeblock\flappyshiba\bomb.h
 	<SDL.h>
 
-1742482868 e:\codeblock\flappyshiba\game.h
+1742534599 e:\codeblock\flappyshiba\game.h
 	<vector>
 	<SDL.h>
 	"Bird.h"

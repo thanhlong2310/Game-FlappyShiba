@@ -13,6 +13,7 @@ class Game
 {
 private:
     SDL_Renderer* renderer;
+    SDL_Texture* backgroundTexture;
     Bird* bird;
     std::vector<Pipe*> pipes;
     std::vector<Bomb*> bombs;
