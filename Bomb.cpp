@@ -3,16 +3,10 @@
 #include "Bomb.h"
 #include "Constants.h"
 
-Bomb::Bomb(int x, int y, SDL_Renderer* renderer)
+Bomb::Bomb(int x, int y, SDL_Texture* tex, SDL_Renderer* renderer)
 {
     rect = {x, y, BOMB_SIZE, BOMB_SIZE};
-    SDL_Surface* surface = IMG_Load("assets/bomb.png");
-    if (!surface)
-    {
-        std::cout << "Failed to load bomb image! SDL_image Error: " << IMG_GetError() << std::endl;
-    }
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
+    texture = tex;
 }
 void Bomb::update()
 {

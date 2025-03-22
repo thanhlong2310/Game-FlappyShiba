@@ -9,7 +9,7 @@ public:
     SDL_Rect lowerRect;
     bool passed;
     SDL_Texture* texture;
-    Pipe(int x, SDL_Renderer* renderer);
+    Pipe(int x, SDL_Texture* tex, SDL_Renderer* renderer);
     void update();
     void render(SDL_Renderer* renderer);
 };

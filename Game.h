@@ -14,6 +14,8 @@ class Game
 private:
     SDL_Renderer* renderer;
     SDL_Texture* backgroundTexture;
+    SDL_Texture* pipeTexture;
+    SDL_Texture* bombTexture;
     Bird* bird;
     std::vector<Pipe*> pipes;
     std::vector<Bomb*> bombs;

@@ -15,16 +15,14 @@ Game::Game(SDL_Renderer* rend) : renderer(rend)
     frameCount = 0;
     explodeTimer = 0;
     SDL_Surface* bgSurface = IMG_Load("assets/background.png");
-    if (!bgSurface)
-    {
-        std::cout << "Failed to load background! SDL_image Error: " << IMG_GetError() << std::endl;
-    }
     backgroundTexture = SDL_CreateTextureFromSurface(renderer, bgSurface);
     SDL_FreeSurface(bgSurface);
-    if (!backgroundTexture)
-    {
-        std::cout << "Failed to create background texture! SDL_Error: " << SDL_GetError() << std::endl;
-    }
+    SDL_Surface* pipeSurface = IMG_Load("assets/pipe.png");
+    pipeTexture = SDL_CreateTextureFromSurface(renderer, pipeSurface);
+    SDL_FreeSurface(pipeSurface);
+    SDL_Surface* bombSurface = IMG_Load("assets/bomb.png");
+    bombTexture = SDL_CreateTextureFromSurface(renderer, bombSurface);
+    SDL_FreeSurface(bombSurface);
 }
 Game::~Game()
 {
@@ -35,6 +33,8 @@ Game::~Game()
     delete startScreen;
     delete gameOverScreen;
     SDL_DestroyTexture(backgroundTexture);
+    SDL_DestroyTexture(pipeTexture);
+    SDL_DestroyTexture(bombTexture);
 }
 void Game::run()
 {
@@ -51,8 +51,11 @@ void Game::run()
         render();
         if(isExploding)
         {
-            SDL_Delay(1000);
-            running = false;
+            explodeTimer += frameTime;
+            if (explodeTimer >= 1000)
+            {
+                running = false;
+            }
         }
         frameTime = SDL_GetTicks() - frameStart;
         if (frameDelay > frameTime)
@@ -130,7 +133,7 @@ void Game::render()
         for (auto pipe : pipes) pipe->render(renderer);
         for (auto bomb : bombs) bomb->render(renderer);
     }
-    if (!running && !isExploding)
+    if (isExploding)
     {
         gameOverScreen->render(renderer);
     }
@@ -138,12 +141,12 @@ void Game::render()
 }
 void Game::spawnPipe()
 {
-    pipes.push_back(new Pipe(SCREEN_WIDTH, renderer));
+    pipes.push_back(new Pipe(SCREEN_WIDTH, pipeTexture, renderer));
 }
 void Game::spawnBomb()
 {
     int y = rand() % (SCREEN_HEIGHT - BOMB_SIZE);
-    bombs.push_back(new Bomb(SCREEN_WIDTH, y, renderer));
+    bombs.push_back(new Bomb(SCREEN_WIDTH, y, bombTexture, renderer));
 }
 void Game::checkCollisions()
 {
@@ -154,6 +157,7 @@ void Game::checkCollisions()
     birdRect.h -= 34;
     for (auto pipe : pipes)
     {
+        if (pipe->upperRect.x > SCREEN_WIDTH || pipe->upperRect.x + pipe->upperRect.w < 0) continue;
         SDL_Rect upperRect = pipe->upperRect;
         upperRect.x += 35;
         upperRect.w -= 70;
@@ -169,6 +173,7 @@ void Game::checkCollisions()
     }
     for (auto bomb : bombs)
     {
+        if (bomb->rect.x > SCREEN_WIDTH || bomb->rect.x + bomb->rect.w < 0) continue;
         SDL_Rect bombRect = bomb->rect;
         bombRect.x += 17;
         bombRect.y += 17;
