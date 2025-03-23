@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 #include "Game.h"
 
 int main(int argc, char* argv[])
@@ -13,6 +14,11 @@ int main(int argc, char* argv[])
     if (IMG_Init(IMG_INIT_PNG) == 0)
     {
         std::cout << "SDL_image could not initialize! IMG_Error: " << IMG_GetError() << std::endl;
+        return -1;
+    }
+    if (TTF_Init() == -1)
+    {
+        std::cout << "SDL_ttf could not initialize! TTF_Error: " << TTF_GetError() << std::endl;
         return -1;
     }
     SDL_Window* window = SDL_CreateWindow("FlappyShiba", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
@@ -31,6 +37,7 @@ int main(int argc, char* argv[])
     game.run();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
     return 0;

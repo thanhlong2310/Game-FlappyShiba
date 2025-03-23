@@ -23,6 +23,18 @@ Game::Game(SDL_Renderer* rend) : renderer(rend)
     SDL_Surface* bombSurface = IMG_Load("assets/bomb.png");
     bombTexture = SDL_CreateTextureFromSurface(renderer, bombSurface);
     SDL_FreeSurface(bombSurface);
+    if (TTF_Init() == -1)
+    {
+        std::cout << "SDL_ttf could not initialize! TTF_Error: " << TTF_GetError() << std::endl;
+    }
+    font = TTF_OpenFont("assets/Arial.ttf", 24);
+    if (!font)
+    {
+        std::cout << "Failed to load font! TTF_Error: " << TTF_GetError() << std::endl;
+    }
+    scoreTexture = nullptr;
+    scoreRect = {10, 10, 0, 0};
+    updateScoreTexture();
 }
 Game::~Game()
 {
@@ -35,6 +47,9 @@ Game::~Game()
     SDL_DestroyTexture(backgroundTexture);
     SDL_DestroyTexture(pipeTexture);
     SDL_DestroyTexture(bombTexture);
+    SDL_DestroyTexture(scoreTexture);
+    TTF_CloseFont(font);
+    TTF_Quit();
 }
 void Game::run()
 {
@@ -132,6 +147,7 @@ void Game::render()
         bird->render(renderer);
         for (auto pipe : pipes) pipe->render(renderer);
         for (auto bomb : bombs) bomb->render(renderer);
+        SDL_RenderCopy(renderer, scoreTexture, nullptr, &scoreRect);
     }
     if (isExploding)
     {
@@ -201,7 +217,22 @@ void Game::updateScore()
         {
             pipe->passed = true;
             score++;
-            std::cout << "Score: " << score << std::endl;
+            updateScoreTexture();
         }
     }
+}
+void Game::updateScoreTexture()
+{
+    if (scoreTexture) SDL_DestroyTexture(scoreTexture);
+    std::string scoreText = "Score: " + std::to_string(score);
+    SDL_Surface* surface = TTF_RenderText_Solid(font, scoreText.c_str(), {255, 255, 255, 255});
+    if (!surface)
+    {
+        std::cout << "Failed to create score surface! TTF_Error: " << TTF_GetError() << std::endl;
+        return;
+    }
+    scoreTexture = SDL_CreateTextureFromSurface(renderer, surface);
+    scoreRect.w = surface->w;
+    scoreRect.h = surface->h;
+    SDL_FreeSurface(surface);
 }

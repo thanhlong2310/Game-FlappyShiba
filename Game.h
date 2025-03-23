@@ -2,6 +2,7 @@
 #define GAME_H
 #include <vector>
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include "Bird.h"
 #include "Pipe.h"
 #include "Bomb.h"
@@ -28,6 +29,10 @@ private:
     int score;
     int frameCount;
     int explodeTimer;
+    TTF_Font* font;
+    SDL_Texture* scoreTexture;
+    SDL_Rect scoreRect;
+    void updateScoreTexture();
     void spawnPipe();
     void spawnBomb();
     void checkCollisions();

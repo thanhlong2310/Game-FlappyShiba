@@ -7,6 +7,7 @@ Bird::Bird(SDL_Renderer* renderer)
 {
     rect = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2, 50, 50};
     velocity = 0.0f;
+    angle = 0.0;
     SDL_Surface* surface = IMG_Load("assets/shiba.png");
     if(!surface)
     {
@@ -19,13 +20,22 @@ void Bird::update()
 {
     velocity += GRAVITY;
     rect.y += velocity;
+    if (velocity < 0)
+    {
+        angle = -20.0;
+    }
+    else if (velocity > 0)
+    {
+        angle = 20.0;
+    }
 }
 void Bird::jump()
 {
     velocity = JUMP_FORCE;
+    angle = -20.0;
 }
 void Bird::render(SDL_Renderer* renderer)
 {
-    SDL_RenderCopy(renderer, texture, nullptr, &rect);
+    SDL_RenderCopyEx(renderer, texture, nullptr, &rect, angle, nullptr, SDL_FLIP_NONE);
 }
 

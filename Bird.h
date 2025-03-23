@@ -8,6 +8,7 @@ public:
     SDL_Rect rect;
     float velocity;
     SDL_Texture* texture;
+    double angle;
     Bird(SDL_Renderer* renderer);
     void update();
     void jump();

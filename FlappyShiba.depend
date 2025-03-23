@@ -1,8 +1,9 @@
 # depslib dependency file v1.0
-1742473014 source:e:\codeblock\flappyshiba\main.cpp
+1742747781 source:e:\codeblock\flappyshiba\main.cpp
 	<iostream>
 	<SDL.h>
 	<SDL_image.h>
+	<SDL_ttf.h>
 	"Game.h"
 
 1740149091 c:\users\admin\downloads\sdl2-devel-2.32.0-mingw\sdl2-2.32.0\x86_64-w64-mingw32\include\sdl2\sdl.h
@@ -457,7 +458,7 @@
 	<iostream>
 	"AudioManager.h"
 
-1742544567 source:e:\codeblock\flappyshiba\bird.cpp
+1742744495 source:e:\codeblock\flappyshiba\bird.cpp
 	<iostream>
 	<SDL_image.h>
 	"Bird.h"
@@ -469,7 +470,7 @@
 	"Bomb.h"
 	"Constants.h"
 
-1742705002 source:e:\codeblock\flappyshiba\game.cpp
+1742748378 source:e:\codeblock\flappyshiba\game.cpp
 	<iostream>
 	<SDL_image.h>
 	"Game.h"
@@ -499,7 +500,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1742481265 e:\codeblock\flappyshiba\bird.h
+1742744423 e:\codeblock\flappyshiba\bird.h
 	<SDL.h>
 
 1742614809 e:\codeblock\flappyshiba\constants.h
@@ -507,9 +508,10 @@
 1742617597 e:\codeblock\flappyshiba\bomb.h
 	<SDL.h>
 
-1742617303 e:\codeblock\flappyshiba\game.h
+1742747781 e:\codeblock\flappyshiba\game.h
 	<vector>
 	<SDL.h>
+	<SDL_ttf.h>
 	"Bird.h"
 	"Pipe.h"
 	"Bomb.h"
@@ -522,4 +524,9 @@
 
 1742371773 e:\codeblock\flappyshiba\screen.h
 	<SDL.h>
+
+1742619331 c:\users\admin\downloads\sdl2_ttf-devel-2.24.0-mingw\sdl2_ttf-2.24.0\x86_64-w64-mingw32\include\sdl2\sdl_ttf.h
+	"SDL.h"
+	"begin_code.h"
+	"close_code.h"
 
