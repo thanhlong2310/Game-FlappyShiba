@@ -151,19 +151,19 @@ void Game::spawnBomb()
 void Game::checkCollisions()
 {
     SDL_Rect birdRect = bird->rect;
-    birdRect.x += 17;
-    birdRect.y += 17;
-    birdRect.w -= 34;
-    birdRect.h -= 34;
+    birdRect.x += 10;
+    birdRect.y += 10;
+    birdRect.w -= 20;
+    birdRect.h -= 20;
     for (auto pipe : pipes)
     {
         if (pipe->upperRect.x > SCREEN_WIDTH || pipe->upperRect.x + pipe->upperRect.w < 0) continue;
         SDL_Rect upperRect = pipe->upperRect;
-        upperRect.x += 35;
-        upperRect.w -= 70;
+        upperRect.x += 20;
+        upperRect.w -= 40;
         SDL_Rect lowerRect = pipe->lowerRect;
-        lowerRect.x += 35;
-        lowerRect.w -= 70;
+        lowerRect.x += 20;
+        lowerRect.w -= 40;
         if (SDL_HasIntersection(&birdRect, &pipe->upperRect) || SDL_HasIntersection(&birdRect, &pipe->lowerRect))
         {
             audioManager->playExplosionSound();
@@ -175,10 +175,10 @@ void Game::checkCollisions()
     {
         if (bomb->rect.x > SCREEN_WIDTH || bomb->rect.x + bomb->rect.w < 0) continue;
         SDL_Rect bombRect = bomb->rect;
-        bombRect.x += 17;
-        bombRect.y += 17;
-        bombRect.w -= 34;
-        bombRect.h -= 34;
+        bombRect.x += 10;
+        bombRect.y += 10;
+        bombRect.w -= 20;
+        bombRect.h -= 20;
         if (SDL_HasIntersection(&birdRect, &bomb->rect))
         {
             audioManager->playExplosionSound();
