@@ -23,6 +23,17 @@ Game::Game(SDL_Renderer* rend) : renderer(rend)
     SDL_Surface* bombSurface = IMG_Load("assets/bomb.png");
     bombTexture = SDL_CreateTextureFromSurface(renderer, bombSurface);
     SDL_FreeSurface(bombSurface);
+    SDL_Surface* explosionSurface = IMG_Load("assets/explosion_sheet.png");
+    if (!explosionSurface)
+    {
+        std::cout << "Failed to load explosion image! SDL_image Error: " << IMG_GetError() << std::endl;
+    }
+    explosionTexture = SDL_CreateTextureFromSurface(renderer, explosionSurface);
+    SDL_FreeSurface(explosionSurface);
+    explosionRect = {0, 0, 150, 150};
+    explosionSrcRect = {0, 0, 100, 100};
+    explosionFrame = 0;
+    explosionFrameCount = 0;
     if (TTF_Init() == -1)
     {
         std::cout << "SDL_ttf could not initialize! TTF_Error: " << TTF_GetError() << std::endl;
@@ -47,6 +58,7 @@ Game::~Game()
     SDL_DestroyTexture(backgroundTexture);
     SDL_DestroyTexture(pipeTexture);
     SDL_DestroyTexture(bombTexture);
+    SDL_DestroyTexture(explosionTexture);
     SDL_DestroyTexture(scoreTexture);
     TTF_CloseFont(font);
     TTF_Quit();
@@ -67,7 +79,7 @@ void Game::run()
         if(isExploding)
         {
             explodeTimer += frameTime;
-            if (explodeTimer >= 1000)
+            if (explodeTimer >= EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION + 1000)
             {
                 running = false;
             }
@@ -144,14 +156,34 @@ void Game::render()
     else
     {
         SDL_RenderCopy(renderer, backgroundTexture, nullptr, nullptr);
-        bird->render(renderer);
+        if(!isExploding)
+        {
+            bird->render(renderer);
+        }
         for (auto pipe : pipes) pipe->render(renderer);
         for (auto bomb : bombs) bomb->render(renderer);
         SDL_RenderCopy(renderer, scoreTexture, nullptr, &scoreRect);
     }
     if (isExploding)
     {
-        gameOverScreen->render(renderer);
+        if(explodeTimer < EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION)
+        {
+            explosionFrameCount += explodeTimer - (explosionFrame * EXPLOSION_FRAME_DURATION);
+            if (explosionFrameCount >= EXPLOSION_FRAME_DURATION)
+            {
+                explosionFrame++;
+                explosionFrameCount = 0;
+            }
+            if (explosionFrame < EXPLOSION_FRAMES)
+            {
+                explosionSrcRect.x = explosionFrame * explosionSrcRect.w;
+                SDL_RenderCopy(renderer, explosionTexture, &explosionSrcRect, &explosionRect);
+            }
+        }
+        if (explodeTimer >= EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION)
+        {
+            gameOverScreen->render(renderer);
+        }
     }
     SDL_RenderPresent(renderer);
 }
@@ -182,8 +214,12 @@ void Game::checkCollisions()
         lowerRect.w -= 40;
         if (SDL_HasIntersection(&birdRect, &pipe->upperRect) || SDL_HasIntersection(&birdRect, &pipe->lowerRect))
         {
+            explosionRect.x = birdRect.x - (explosionRect.w / 2);
+            explosionRect.y = birdRect.y - (explosionRect.h / 2);
             audioManager->playExplosionSound();
             isExploding = true;
+            explosionFrame = 0;
+            explosionFrameCount = 0;
             return;
         }
     }
@@ -197,15 +233,23 @@ void Game::checkCollisions()
         bombRect.h -= 20;
         if (SDL_HasIntersection(&birdRect, &bomb->rect))
         {
+            explosionRect.x = birdRect.x - (explosionRect.w / 2);
+            explosionRect.y = birdRect.y - (explosionRect.h / 2);
             audioManager->playExplosionSound();
             isExploding = true;
+            explosionFrame = 0;
+            explosionFrameCount = 0;
             return;
         }
     }
     if (birdRect.y < 0 || birdRect.y + birdRect.h > SCREEN_HEIGHT)
     {
+        explosionRect.x = birdRect.x - (explosionRect.w / 2);
+        explosionRect.y = birdRect.y - (explosionRect.h / 2);
         audioManager->playExplosionSound();
         isExploding = true;
+        explosionFrame = 0;
+        explosionFrameCount = 0;
         return;
     }
 }
