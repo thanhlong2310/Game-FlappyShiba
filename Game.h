@@ -37,6 +37,8 @@ private:
     SDL_Rect explosionSrcRect;
     int explosionFrame;
     int explosionFrameCount;
+    int pipeSpeed;
+    int bombSpeed;
     static const int EXPLOSION_FRAMES = 4;
     static const int EXPLOSION_FRAME_DURATION = 10;
     void updateScoreTexture();
@@ -51,5 +53,7 @@ public:
     void handleEvents();
     void update();
     void render();
+    int getPipeSpeed() const { return pipeSpeed; }
+    int getBombSpeed() const { return bombSpeed; }
 };
 #endif

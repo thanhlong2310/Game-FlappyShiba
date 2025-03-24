@@ -12,10 +12,10 @@ Pipe::Pipe(int x, SDL_Texture* tex, SDL_Renderer* renderer)
     passed = false;
     texture = tex;
 }
-void Pipe::update()
+void Pipe::update(int speed)
 {
-    upperRect.x -= PIPE_SPEED;
-    lowerRect.x -= PIPE_SPEED;
+    upperRect.x -= speed;
+    lowerRect.x -= speed;
 }
 void Pipe::render(SDL_Renderer* renderer)
 {

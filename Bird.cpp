@@ -22,17 +22,17 @@ void Bird::update()
     rect.y += velocity;
     if (velocity < 0)
     {
-        angle = -20.0;
+        angle = BIRD_ANGLE_UP;
     }
     else if (velocity > 0)
     {
-        angle = 20.0;
+        angle = BIRD_ANGLE_DOWN;
     }
 }
 void Bird::jump()
 {
     velocity = JUMP_FORCE;
-    angle = -20.0;
+    angle = BIRD_ANGLE_UP;
 }
 void Bird::render(SDL_Renderer* renderer)
 {

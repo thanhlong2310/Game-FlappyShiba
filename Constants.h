@@ -10,4 +10,6 @@ const int PIPE_GAP = 200;
 const int BOMB_SPEED = 5;
 const int BOMB_SIZE = 50;
 const int BOMB_SPAWN_RATE = 150;
+const double BIRD_ANGLE_UP = -20.0;
+const double BIRD_ANGLE_DOWN = 20.0;
 #endif

@@ -14,6 +14,8 @@ Game::Game(SDL_Renderer* rend) : renderer(rend)
     score = 0;
     frameCount = 0;
     explodeTimer = 0;
+    pipeSpeed = PIPE_SPEED;
+    bombSpeed = BOMB_SPEED;
     SDL_Surface* bgSurface = IMG_Load("assets/background.png");
     backgroundTexture = SDL_CreateTextureFromSurface(renderer, bgSurface);
     SDL_FreeSurface(bgSurface);
@@ -124,7 +126,7 @@ void Game::update()
     if (frameCount % BOMB_SPAWN_RATE == 0) spawnBomb();
     for (auto it = pipes.begin(); it != pipes.end();)
     {
-        (*it)->update();
+        (*it)->update(pipeSpeed);
         if ((*it)->upperRect.x < -100)
         {
             delete *it;
@@ -134,7 +136,7 @@ void Game::update()
     }
     for (auto it = bombs.begin(); it != bombs.end();)
     {
-        (*it)->update();
+        (*it)->update(bombSpeed);
         if ((*it)->rect.x < -BOMB_SIZE)
         {
             delete *it;
@@ -223,15 +225,20 @@ void Game::checkCollisions()
             return;
         }
     }
-    for (auto bomb : bombs)
+    for (auto it = bombs.begin(); it != bombs.end();)
     {
-        if (bomb->rect.x > SCREEN_WIDTH || bomb->rect.x + bomb->rect.w < 0) continue;
-        SDL_Rect bombRect = bomb->rect;
+        if ((*it)->rect.x > SCREEN_WIDTH || (*it)->rect.x + (*it)->rect.w < 0)
+        {
+            delete *it;
+            it = bombs.erase(it);
+            continue;
+        }
+        SDL_Rect bombRect = (*it)->rect;
         bombRect.x += 10;
         bombRect.y += 10;
         bombRect.w -= 20;
         bombRect.h -= 20;
-        if (SDL_HasIntersection(&birdRect, &bomb->rect))
+        if (SDL_HasIntersection(&birdRect, &(*it)->rect))
         {
             explosionRect.x = birdRect.x - (explosionRect.w / 2);
             explosionRect.y = birdRect.y - (explosionRect.h / 2);
@@ -239,7 +246,13 @@ void Game::checkCollisions()
             isExploding = true;
             explosionFrame = 0;
             explosionFrameCount = 0;
+            delete *it;
+            it = bombs.erase(it);
             return;
+        }
+        else
+        {
+            ++it;
         }
     }
     if (birdRect.y < 0 || birdRect.y + birdRect.h > SCREEN_HEIGHT)
@@ -262,6 +275,11 @@ void Game::updateScore()
             pipe->passed = true;
             score++;
             updateScoreTexture();
+            if (score % 10 == 0)
+            {
+                pipeSpeed += 1;
+                bombSpeed += 1;
+            }
         }
     }
 }
