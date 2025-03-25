@@ -26,6 +26,7 @@ private:
     bool running;
     bool gameStarted;
     bool isExploding;
+    bool isPaused;
     int score;
     int frameCount;
     int explodeTimer;

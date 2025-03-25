@@ -11,6 +11,7 @@ Game::Game(SDL_Renderer* rend) : renderer(rend)
     running = true;
     gameStarted = false;
     isExploding = false;
+    isPaused = false;
     score = 0;
     frameCount = 0;
     explodeTimer = 0;
@@ -108,10 +109,25 @@ void Game::handleEvents()
             if (event.key.keysym.sym == SDLK_SPACE)
             {
                 if (!gameStarted) gameStarted = true;
-                else
+                else if (!isPaused)
                 {
                     bird->jump();
                     audioManager->playJumpSound();
+                }
+            }
+            else if (event.key.keysym.sym == SDLK_p)
+            {
+                if (gameStarted && !isExploding&& explodeTimer < EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION + 1000)
+                {
+                    isPaused = !isPaused;
+                    if (isPaused)
+                    {
+                        audioManager->stopBackgroundMusic();
+                    }
+                    else
+                    {
+                        audioManager->playBackgroundMusic();
+                    }
                 }
             }
         }
@@ -119,7 +135,7 @@ void Game::handleEvents()
 }
 void Game::update()
 {
-    if (!gameStarted || isExploding) return;
+    if (!gameStarted || isExploding || isPaused) return;
     bird->update();
     frameCount++;
     if (frameCount % 90 == 0) spawnPipe();
@@ -165,6 +181,15 @@ void Game::render()
         for (auto pipe : pipes) pipe->render(renderer);
         for (auto bomb : bombs) bomb->render(renderer);
         SDL_RenderCopy(renderer, scoreTexture, nullptr, &scoreRect);
+        if (isPaused)
+        {
+            SDL_Surface* pauseSurface = TTF_RenderText_Solid(font, "Paused", {255, 255, 255, 255});
+            SDL_Texture* pauseTexture = SDL_CreateTextureFromSurface(renderer, pauseSurface);
+            SDL_Rect pauseRect = {SCREEN_WIDTH / 2 - pauseSurface->w / 2, SCREEN_HEIGHT / 2 - pauseSurface->h / 2, pauseSurface->w, pauseSurface->h};
+            SDL_RenderCopy(renderer, pauseTexture, nullptr, &pauseRect);
+            SDL_FreeSurface(pauseSurface);
+            SDL_DestroyTexture(pauseTexture);
+        }
     }
     if (isExploding)
     {
