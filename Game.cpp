@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SDL_image.h>
 #include "Game.h"
+#include "Constants.h"
 
 Game::Game(SDL_Renderer* rend) : renderer(rend)
 {

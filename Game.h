@@ -40,8 +40,6 @@ private:
     int explosionFrameCount;
     int pipeSpeed;
     int bombSpeed;
-    static const int EXPLOSION_FRAMES = 4;
-    static const int EXPLOSION_FRAME_DURATION = 10;
     void updateScoreTexture();
     void spawnPipe();
     void spawnBomb();
