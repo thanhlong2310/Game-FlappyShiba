@@ -40,6 +40,7 @@ private:
     int explosionFrameCount;
     int pipeSpeed;
     int bombSpeed;
+    int bombSpawnRate;
     void updateScoreTexture();
     void spawnPipe();
     void spawnBomb();

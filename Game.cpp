@@ -18,6 +18,7 @@ Game::Game(SDL_Renderer* rend) : renderer(rend)
     explodeTimer = 0;
     pipeSpeed = PIPE_SPEED;
     bombSpeed = BOMB_SPEED;
+    bombSpawnRate = 150;
     SDL_Surface* bgSurface = IMG_Load("assets/background.png");
     backgroundTexture = SDL_CreateTextureFromSurface(renderer, bgSurface);
     SDL_FreeSurface(bgSurface);
@@ -140,7 +141,7 @@ void Game::update()
     bird->update();
     frameCount++;
     if (frameCount % 90 == 0) spawnPipe();
-    if (frameCount % BOMB_SPAWN_RATE == 0) spawnBomb();
+    if (frameCount % bombSpawnRate == 0) spawnBomb();
     for (auto it = pipes.begin(); it != pipes.end();)
     {
         (*it)->update(pipeSpeed);
@@ -305,6 +306,8 @@ void Game::updateScore()
             {
                 pipeSpeed += 1;
                 bombSpeed += 1;
+                bombSpawnRate -= 30;
+                if (bombSpawnRate < 30) bombSpawnRate = 30;
             }
         }
     }

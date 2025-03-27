@@ -9,9 +9,8 @@ const int PIPE_SPEED = 3;
 const int PIPE_GAP = 200;
 const int BOMB_SPEED = 5;
 const int BOMB_SIZE = 50;
-const int BOMB_SPAWN_RATE = 150;
 const double BIRD_ANGLE_UP = -20.0;
 const double BIRD_ANGLE_DOWN = 20.0;
 static const int EXPLOSION_FRAMES = 4;
-static const int EXPLOSION_FRAME_DURATION = 7;
+static const int EXPLOSION_FRAME_DURATION = 6;
 #endif

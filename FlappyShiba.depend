@@ -470,7 +470,7 @@
 	"Bomb.h"
 	"Constants.h"
 
-1742895078 source:e:\codeblock\flappyshiba\game.cpp
+1743097041 source:e:\codeblock\flappyshiba\game.cpp
 	<iostream>
 	<SDL_image.h>
 	"Game.h"
@@ -504,12 +504,12 @@
 1742744423 e:\codeblock\flappyshiba\bird.h
 	<SDL.h>
 
-1742895099 e:\codeblock\flappyshiba\constants.h
+1743096349 e:\codeblock\flappyshiba\constants.h
 
 1742832664 e:\codeblock\flappyshiba\bomb.h
 	<SDL.h>
 
-1742895078 e:\codeblock\flappyshiba\game.h
+1743096349 e:\codeblock\flappyshiba\game.h
 	<vector>
 	<SDL.h>
 	<SDL_ttf.h>
