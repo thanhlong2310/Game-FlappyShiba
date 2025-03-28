@@ -1,13 +1,13 @@
 #include <iostream>
 #include <SDL_image.h>
 #include "Game.h"
-#include "Constants.h"
 
 Game::Game(SDL_Renderer* rend) : renderer(rend)
 {
+    gravity = 0.2f;
+    jumpForce = -6.0f;
     bird = new Bird(renderer);
     audioManager = new AudioManager();
-    startScreen = new Screen("assets/start.png", renderer);
     gameOverScreen = new Screen("assets/gameover.png", renderer);
     running = true;
     gameStarted = false;
@@ -51,6 +51,34 @@ Game::Game(SDL_Renderer* rend) : renderer(rend)
     scoreTexture = nullptr;
     scoreRect = {10, 10, 0, 0};
     updateScoreTexture();
+    SDL_Surface* startButtonSurface = IMG_Load("assets/start_button.png");
+    startButtonTexture = SDL_CreateTextureFromSurface(renderer, startButtonSurface);
+    SDL_FreeSurface(startButtonSurface);
+    startButtonRect = {SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT * 2 / 3 - 25, 100, 50};
+    levelSelection = false;
+    SDL_Surface* panelSurface = IMG_Load("assets/panel.png");
+    panelTexture = SDL_CreateTextureFromSurface(renderer, panelSurface);
+    SDL_FreeSurface(panelSurface);
+    levelPanelRect = {SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2 - 100, 300, 200};
+    SDL_Surface* level1Surface = IMG_Load("assets/level1_button.png");
+    level1ButtonTexture = SDL_CreateTextureFromSurface(renderer, level1Surface);
+    SDL_FreeSurface(level1Surface);
+    level1ButtonRect = {SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 75, 100, 50};
+    SDL_Surface* levelAsianSurface = IMG_Load("assets/levelasian_button.png");
+    levelAsianButtonTexture = SDL_CreateTextureFromSurface(renderer, levelAsianSurface);
+    SDL_FreeSurface(levelAsianSurface);
+    levelAsianButtonRect = {SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 + 25, 100, 50};
+    currentLevel = 0;
+    highScore = 0;
+    highScoreTexture = nullptr;
+    highScoreRect = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 75, 0, 0};
+    currentScoreTexture = nullptr;
+    currentScoreRect = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 25, 0, 0};
+    SDL_Surface* replaySurface = IMG_Load("assets/replay_button.png");
+    replayButtonTexture = SDL_CreateTextureFromSurface(renderer, replaySurface);
+    SDL_FreeSurface(replaySurface);
+    replayButtonRect = {SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 + 25, 100, 50};
+    gameOverPanelRect = {SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2 - 100, 300, 200};
 }
 Game::~Game()
 {
@@ -58,13 +86,19 @@ Game::~Game()
     for (auto pipe : pipes) delete pipe;
     for (auto bomb : bombs) delete bomb;
     delete audioManager;
-    delete startScreen;
     delete gameOverScreen;
     SDL_DestroyTexture(backgroundTexture);
     SDL_DestroyTexture(pipeTexture);
     SDL_DestroyTexture(bombTexture);
     SDL_DestroyTexture(explosionTexture);
     SDL_DestroyTexture(scoreTexture);
+    SDL_DestroyTexture(startButtonTexture);
+    SDL_DestroyTexture(panelTexture);
+    SDL_DestroyTexture(level1ButtonTexture);
+    SDL_DestroyTexture(levelAsianButtonTexture);
+    SDL_DestroyTexture(highScoreTexture);
+    SDL_DestroyTexture(currentScoreTexture);
+    SDL_DestroyTexture(replayButtonTexture);
     TTF_CloseFont(font);
     TTF_Quit();
 }
@@ -106,12 +140,88 @@ void Game::handleEvents()
         {
             running = false;
         }
-        if (event.type == SDL_KEYDOWN)
+        else if (event.type == SDL_MOUSEBUTTONDOWN)
+        {
+            int x = event.button.x;
+            int y = event.button.y;
+            if (!gameStarted && !levelSelection)
+            {
+                if (x >= startButtonRect.x && x <= startButtonRect.x + startButtonRect.w && y >= startButtonRect.y && y <= startButtonRect.y + startButtonRect.h)
+                {
+                    levelSelection = true;
+                }
+            }
+            else if (levelSelection)
+            {
+                if (x >= level1ButtonRect.x && x <= level1ButtonRect.x + level1ButtonRect.w && y >= level1ButtonRect.y && y <= level1ButtonRect.y + level1ButtonRect.h)
+                {
+                    currentLevel = 1;
+                    gameStarted = true;
+                    levelSelection = false;
+                    gravity = 0.2f;
+                    jumpForce = -6.0f;
+                    pipeSpeed = PIPE_SPEED;
+                    bombSpeed = BOMB_SPEED;
+                    bombSpawnRate = 150;
+                    bird->gravity = gravity;
+                    bird->jumpForce = jumpForce;
+                }
+                else if (x >= levelAsianButtonRect.x && x <= levelAsianButtonRect.x + levelAsianButtonRect.w && y >= levelAsianButtonRect.y && y <= levelAsianButtonRect.y + levelAsianButtonRect.h)
+                {
+                    currentLevel = 2;
+                    gameStarted = true;
+                    levelSelection = false;
+                    gravity = 0.2f * 3;
+                    jumpForce = -6.0f * 3;
+                    pipeSpeed = PIPE_SPEED * 3;
+                    bombSpeed = BOMB_SPEED * 3;
+                    bombSpawnRate = 10;
+                    bird->gravity = gravity;
+                    bird->jumpForce = jumpForce;
+                }
+            }
+            else if (isExploding && explodeTimer >= EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION)
+            {
+                if (x >= replayButtonRect.x && x <= replayButtonRect.x + replayButtonRect.w && y >= replayButtonRect.y && y <= replayButtonRect.y + replayButtonRect.h)
+                {
+                    score = 0;
+                    frameCount = 0;
+                    explodeTimer = 0;
+                    isExploding = false;
+                    if (currentLevel == 1)
+                    {
+                        gravity = 0.2f;
+                        jumpForce = -6.0f;
+                        pipeSpeed = PIPE_SPEED;
+                        bombSpeed = BOMB_SPEED;
+                        bombSpawnRate = 150;
+                    }
+                    else if (currentLevel == 2)
+                    {
+                        gravity = 0.2f * 3;
+                        jumpForce = -6.0f * 3;
+                        pipeSpeed = PIPE_SPEED * 3;
+                        bombSpeed = BOMB_SPEED * 3;
+                        bombSpawnRate = 10;
+                    }
+                    bird->gravity = gravity;
+                    bird->jumpForce = jumpForce;
+                    bird->rect = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2, 50, 50};
+                    bird->velocity = 0;
+                    bird->angle = 0;
+                    for (auto pipe : pipes) delete pipe;
+                    pipes.clear();
+                    for (auto bomb : bombs) delete bomb;
+                    bombs.clear();
+                    updateScoreTexture();
+                }
+            }
+        }
+        if (event.type == SDL_KEYDOWN && gameStarted && !levelSelection)
         {
             if (event.key.keysym.sym == SDLK_SPACE)
             {
-                if (!gameStarted) gameStarted = true;
-                else if (!isPaused)
+                if (!isPaused)
                 {
                     bird->jump();
                     audioManager->playJumpSound();
@@ -119,7 +229,7 @@ void Game::handleEvents()
             }
             else if (event.key.keysym.sym == SDLK_p)
             {
-                if (gameStarted && !isExploding&& explodeTimer < EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION + 1000)
+                if (!isExploding && explodeTimer < EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION + 1000)
                 {
                     isPaused = !isPaused;
                     if (isPaused)
@@ -169,9 +279,17 @@ void Game::render()
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-    if (!gameStarted)
+    if (!gameStarted && !levelSelection)
     {
-        startScreen->render(renderer);
+        SDL_RenderCopy(renderer, backgroundTexture, nullptr, nullptr);
+        SDL_RenderCopy(renderer, startButtonTexture, nullptr, &startButtonRect);
+    }
+    else if (levelSelection)
+    {
+        SDL_RenderCopy(renderer, backgroundTexture, nullptr, nullptr);
+        SDL_RenderCopy(renderer, panelTexture, nullptr, &levelPanelRect);
+        SDL_RenderCopy(renderer, level1ButtonTexture, nullptr, &level1ButtonRect);
+        SDL_RenderCopy(renderer, levelAsianButtonTexture, nullptr, &levelAsianButtonRect);
     }
     else
     {
@@ -209,9 +327,13 @@ void Game::render()
                 SDL_RenderCopy(renderer, explosionTexture, &explosionSrcRect, &explosionRect);
             }
         }
-        if (explodeTimer >= EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION)
+        else
         {
             gameOverScreen->render(renderer);
+            SDL_RenderCopy(renderer, panelTexture, nullptr, &gameOverPanelRect);
+            SDL_RenderCopy(renderer, highScoreTexture, nullptr, &highScoreRect);
+            SDL_RenderCopy(renderer, currentScoreTexture, nullptr, &currentScoreRect);
+            SDL_RenderCopy(renderer, replayButtonTexture, nullptr, &replayButtonRect);
         }
     }
     SDL_RenderPresent(renderer);
@@ -273,6 +395,9 @@ void Game::checkCollisions()
             isExploding = true;
             explosionFrame = 0;
             explosionFrameCount = 0;
+            if (score > highScore) highScore = score;
+            updateHighScoreTexture();
+            updateCurrentScoreTexture();
             delete *it;
             it = bombs.erase(it);
             return;
@@ -290,6 +415,9 @@ void Game::checkCollisions()
         isExploding = true;
         explosionFrame = 0;
         explosionFrameCount = 0;
+        if (score > highScore) highScore = score;
+        updateHighScoreTexture();
+        updateCurrentScoreTexture();
         return;
     }
 }
@@ -325,5 +453,25 @@ void Game::updateScoreTexture()
     scoreTexture = SDL_CreateTextureFromSurface(renderer, surface);
     scoreRect.w = surface->w;
     scoreRect.h = surface->h;
+    SDL_FreeSurface(surface);
+}
+void Game::updateHighScoreTexture()
+{
+    if (highScoreTexture) SDL_DestroyTexture(highScoreTexture);
+    std::string highScoreText = "High Score: " + std::to_string(highScore);
+    SDL_Surface* surface = TTF_RenderText_Solid(font, highScoreText.c_str(), {255, 255, 255, 255});
+    highScoreTexture = SDL_CreateTextureFromSurface(renderer, surface);
+    highScoreRect.w = surface->w;
+    highScoreRect.h = surface->h;
+    SDL_FreeSurface(surface);
+}
+void Game::updateCurrentScoreTexture()
+{
+    if (currentScoreTexture) SDL_DestroyTexture(currentScoreTexture);
+    std::string scoreText = "Score: " + std::to_string(score);
+    SDL_Surface* surface = TTF_RenderText_Solid(font, scoreText.c_str(), {255, 255, 255, 255});
+    currentScoreTexture = SDL_CreateTextureFromSurface(renderer, surface);
+    currentScoreRect.w = surface->w;
+    currentScoreRect.h = surface->h;
     SDL_FreeSurface(surface);
 }

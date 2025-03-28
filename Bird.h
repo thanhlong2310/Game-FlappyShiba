@@ -9,6 +9,8 @@ public:
     float velocity;
     SDL_Texture* texture;
     double angle;
+    float gravity;
+    float jumpForce;
     Bird(SDL_Renderer* renderer);
     void update();
     void jump();
