@@ -4,13 +4,16 @@
 #include "Pipe.h"
 #include "Constants.h"
 
-Pipe::Pipe(int x, SDL_Texture* tex, SDL_Renderer* renderer)
+Pipe::Pipe(int x, SDL_Texture* upperTex, SDL_Texture* lowerTex, SDL_Renderer* renderer)
 {
-    int height = rand() % (SCREEN_HEIGHT - PIPE_GAP - 100) + 50;
-    upperRect = {x, 0, 100, height};
-    lowerRect = {x, height + PIPE_GAP, 100, SCREEN_HEIGHT - height - PIPE_GAP};
+    const int PIPE_WIDTH = 100;
+    const int PIPE_HEIGHT = 300;
+    int gapY = rand() % (SCREEN_HEIGHT - PIPE_GAP - 100) + 50;
+    upperRect = {x, 0, PIPE_WIDTH, gapY};
+    lowerRect = {x, gapY + PIPE_GAP, PIPE_WIDTH, SCREEN_HEIGHT - (gapY + PIPE_GAP)};
     passed = false;
-    texture = tex;
+    upperTexture = upperTex;
+    lowerTexture = lowerTex;
 }
 void Pipe::update(int speed)
 {
@@ -19,6 +22,9 @@ void Pipe::update(int speed)
 }
 void Pipe::render(SDL_Renderer* renderer)
 {
-    SDL_RenderCopyEx(renderer, texture, nullptr, &upperRect, 0.0, nullptr, SDL_FLIP_VERTICAL);
-    SDL_RenderCopy(renderer, texture, nullptr, &lowerRect);
+    const int PIPE_HEIGHT = 300;
+    SDL_Rect upperSrcRect = {0, PIPE_HEIGHT - upperRect.h, upperRect.w, upperRect.h};
+    SDL_RenderCopy(renderer, upperTexture, &upperSrcRect, &upperRect);
+    SDL_Rect lowerSrcRect = {0, 0, lowerRect.w, lowerRect.h};
+    SDL_RenderCopy(renderer, lowerTexture, &lowerSrcRect, &lowerRect);
 }

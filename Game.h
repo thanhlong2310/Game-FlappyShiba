@@ -15,13 +15,13 @@ class Game
 private:
     SDL_Renderer* renderer;
     SDL_Texture* backgroundTexture;
-    SDL_Texture* pipeTexture;
+    SDL_Texture* upperPipeTexture;
+    SDL_Texture* lowerPipeTexture;
     SDL_Texture* bombTexture;
     Bird* bird;
     std::vector<Pipe*> pipes;
     std::vector<Bomb*> bombs;
     AudioManager* audioManager;
-    Screen* gameOverScreen;
     bool running;
     bool gameStarted;
     bool isExploding;
@@ -44,15 +44,19 @@ private:
     float jumpForce;
     SDL_Texture* startButtonTexture;
     SDL_Rect startButtonRect;
+    SDL_Texture* flappyBirdTitleTexture;
+    SDL_Rect flappyBirdTitleRect;
     bool levelSelection;
     SDL_Texture* panelTexture;
     SDL_Rect levelPanelRect;
     SDL_Texture* level1ButtonTexture;
     SDL_Rect level1ButtonRect;
+    SDL_Texture* level2ButtonTexture;
+    SDL_Rect level2ButtonRect;
     SDL_Texture* levelAsianButtonTexture;
     SDL_Rect levelAsianButtonRect;
     int currentLevel;
-    int highScore;
+    int highScores[3];
     SDL_Texture* highScoreTexture;
     SDL_Rect highScoreRect;
     SDL_Texture* currentScoreTexture;
@@ -60,6 +64,8 @@ private:
     SDL_Texture* replayButtonTexture;
     SDL_Rect replayButtonRect;
     SDL_Rect gameOverPanelRect;
+    SDL_Texture* exitButtonTexture;
+    SDL_Rect exitButtonRect;
     void updateScoreTexture();
     void spawnPipe();
     void spawnBomb();

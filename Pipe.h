@@ -8,8 +8,9 @@ public:
     SDL_Rect upperRect;
     SDL_Rect lowerRect;
     bool passed;
-    SDL_Texture* texture;
-    Pipe(int x, SDL_Texture* tex, SDL_Renderer* renderer);
+    SDL_Texture* upperTexture;
+    SDL_Texture* lowerTexture;
+    Pipe(int x, SDL_Texture* upperTex, SDL_Texture* lowerTex, SDL_Renderer* renderer);
     void update(int speed);
     void render(SDL_Renderer* renderer);
 };
