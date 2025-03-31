@@ -12,12 +12,21 @@ Game::Game(SDL_Renderer* rend) : renderer(rend)
     gameStarted = false;
     isExploding = false;
     isPaused = false;
+    isCountingDown = false;
+    countdownTimer = 0;
+    countdownNumber = 3;
     score = 0;
     frameCount = 0;
+    rocketFrameCount = 0;
     explodeTimer = 0;
     pipeSpeed = PIPE_SPEED;
     bombSpeed = BOMB_SPEED;
     bombSpawnRate = 150;
+    rocketVerticalSpeed = ROCKET_SPEED;
+    shakeTimer = 0;
+    shakeIntensity = 3;
+    shakeOffsetX = 0;
+    shakeOffsetY = 0;
     SDL_Surface* bgSurface = IMG_Load("assets/background.png");
     backgroundTexture = SDL_CreateTextureFromSurface(renderer, bgSurface);
     SDL_FreeSurface(bgSurface);
@@ -38,6 +47,13 @@ Game::Game(SDL_Renderer* rend) : renderer(rend)
     SDL_Surface* bombSurface = IMG_Load("assets/bomb.png");
     bombTexture = SDL_CreateTextureFromSurface(renderer, bombSurface);
     SDL_FreeSurface(bombSurface);
+    SDL_Surface* rocketSurface = IMG_Load("assets/rocket.png");
+    if (!rocketSurface)
+    {
+        std::cout << "Failed to load rocket image! SDL_image Error: " << IMG_GetError() << std::endl;
+    }
+    rocketTexture = SDL_CreateTextureFromSurface(renderer, rocketSurface);
+    SDL_FreeSurface(rocketSurface);
     SDL_Surface* explosionSurface = IMG_Load("assets/explosion_sheet.png");
     if (!explosionSurface)
     {
@@ -120,11 +136,13 @@ Game::~Game()
     delete bird;
     for (auto pipe : pipes) delete pipe;
     for (auto bomb : bombs) delete bomb;
+    for (auto rocket : rockets) delete rocket;
     delete audioManager;
     SDL_DestroyTexture(backgroundTexture);
     SDL_DestroyTexture(upperPipeTexture);
     SDL_DestroyTexture(lowerPipeTexture);
     SDL_DestroyTexture(bombTexture);
+    SDL_DestroyTexture(rocketTexture);
     SDL_DestroyTexture(explosionTexture);
     SDL_DestroyTexture(scoreTexture);
     SDL_DestroyTexture(startButtonTexture);
@@ -155,11 +173,7 @@ void Game::run()
         render();
         if(isExploding)
         {
-            explodeTimer += frameTime;
-            if (explodeTimer >= EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION + 1000)
-            {
-                running = false;
-            }
+            explodeTimer ++;
         }
         frameTime = SDL_GetTicks() - frameStart;
         if (frameDelay > frameTime)
@@ -196,11 +210,15 @@ void Game::handleEvents()
                     currentLevel = 1;
                     gameStarted = true;
                     levelSelection = false;
+                    isCountingDown = true;
+                    countdownTimer = 0;
+                    countdownNumber = 3;
                     gravity = 0.2f;
                     jumpForce = -6.0f;
                     pipeSpeed = PIPE_SPEED;
                     bombSpeed = BOMB_SPEED;
                     bombSpawnRate = 150;
+                    rocketVerticalSpeed = ROCKET_SPEED;
                     bird->gravity = gravity;
                     bird->jumpForce = jumpForce;
                 }
@@ -209,11 +227,15 @@ void Game::handleEvents()
                     currentLevel = 2;
                     gameStarted = true;
                     levelSelection = false;
+                    isCountingDown = true;
+                    countdownTimer = 0;
+                    countdownNumber = 3;
                     gravity = 0.2f * 1.5;
                     jumpForce = -6.0f * 1.5;
                     pipeSpeed = PIPE_SPEED * 1.5;
                     bombSpeed = BOMB_SPEED * 1.5;
                     bombSpawnRate = 90;
+                    rocketVerticalSpeed = ROCKET_SPEED * 1.5;
                     bird->gravity = gravity;
                     bird->jumpForce = jumpForce;
                 }
@@ -222,11 +244,15 @@ void Game::handleEvents()
                     currentLevel = 3;
                     gameStarted = true;
                     levelSelection = false;
+                    isCountingDown = true;
+                    countdownTimer = 0;
+                    countdownNumber = 3;
                     gravity = 0.2f * 3;
                     jumpForce = -6.0f * 3;
                     pipeSpeed = PIPE_SPEED * 3;
                     bombSpeed = BOMB_SPEED * 3;
-                    bombSpawnRate = 10;
+                    bombSpawnRate = 60;
+                    rocketVerticalSpeed = ROCKET_SPEED * 3;
                     bird->gravity = gravity;
                     bird->jumpForce = jumpForce;
                 }
@@ -237,8 +263,13 @@ void Game::handleEvents()
                 {
                     score = 0;
                     frameCount = 0;
+                    rocketFrameCount = 0;
                     explodeTimer = 0;
                     isExploding = false;
+                    shakeTimer = 0;
+                    isCountingDown = true;
+                    countdownTimer = 0;
+                    countdownNumber = 3;
                     if (currentLevel == 1)
                     {
                         gravity = 0.2f;
@@ -246,6 +277,7 @@ void Game::handleEvents()
                         pipeSpeed = PIPE_SPEED;
                         bombSpeed = BOMB_SPEED;
                         bombSpawnRate = 150;
+                        rocketVerticalSpeed = ROCKET_SPEED;
                     }
                     else if (currentLevel == 2)
                     {
@@ -254,6 +286,7 @@ void Game::handleEvents()
                         pipeSpeed = PIPE_SPEED * 1.5;
                         bombSpeed = BOMB_SPEED * 1.5;
                         bombSpawnRate = 90;
+                        rocketVerticalSpeed = ROCKET_SPEED * 1.5;
                     }
                     else if (currentLevel == 3)
                     {
@@ -262,6 +295,7 @@ void Game::handleEvents()
                         pipeSpeed = PIPE_SPEED * 3;
                         bombSpeed = BOMB_SPEED * 3;
                         bombSpawnRate = 60;
+                        rocketVerticalSpeed = ROCKET_SPEED * 3;
                     }
                     bird->gravity = gravity;
                     bird->jumpForce = jumpForce;
@@ -272,6 +306,8 @@ void Game::handleEvents()
                     pipes.clear();
                     for (auto bomb : bombs) delete bomb;
                     bombs.clear();
+                    for (auto rocket : rockets) delete rocket;
+                    rockets.clear();
                     updateScoreTexture();
                     updateHighScoreTexture();
                     updateCurrentScoreTexture();
@@ -284,6 +320,8 @@ void Game::handleEvents()
                     explodeTimer = 0;
                     score = 0;
                     frameCount = 0;
+                    rocketFrameCount = 0;
+                    shakeTimer = 0;
                     bird->rect = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2, 50, 50};
                     bird->velocity = 0;
                     bird->angle = 0;
@@ -291,6 +329,8 @@ void Game::handleEvents()
                     pipes.clear();
                     for (auto bomb : bombs) delete bomb;
                     bombs.clear();
+                    for (auto rocket : rockets) delete rocket;
+                    rockets.clear();
                     updateScoreTexture();
                     updateHighScoreTexture();
                     updateCurrentScoreTexture();
@@ -301,7 +341,7 @@ void Game::handleEvents()
         {
             if (event.key.keysym.sym == SDLK_SPACE)
             {
-                if (!isPaused)
+                if (!isCountingDown && !isPaused && !isExploding)
                 {
                     bird->jump();
                     audioManager->playJumpSound();
@@ -309,7 +349,7 @@ void Game::handleEvents()
             }
             else if (event.key.keysym.sym == SDLK_p)
             {
-                if (!isExploding && explodeTimer < EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION + 1000)
+                if (!isCountingDown && !isExploding && explodeTimer < EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION + 1000)
                 {
                     isPaused = !isPaused;
                     if (isPaused)
@@ -327,11 +367,42 @@ void Game::handleEvents()
 }
 void Game::update()
 {
+    if (shakeTimer > 0)
+    {
+        shakeTimer--;
+        shakeOffsetX = (rand() % (2 * shakeIntensity + 1)) - shakeIntensity;
+        shakeOffsetY = (rand() % (2 * shakeIntensity + 1)) - shakeIntensity;
+    }
+    else
+    {
+        shakeOffsetX = 0;
+        shakeOffsetY = 0;
+    }
+    if (isCountingDown)
+    {
+        countdownTimer++;
+        if (countdownTimer >= 60)
+        {
+            countdownNumber--;
+            countdownTimer = 0;
+            if (countdownNumber <= 0)
+            {
+                isCountingDown = false;
+            }
+        }
+        return;
+    }
     if (!gameStarted || isExploding || isPaused) return;
     bird->update();
     frameCount++;
+    rocketFrameCount++;
     if (frameCount % 90 == 0) spawnPipe();
     if (frameCount % bombSpawnRate == 0) spawnBomb();
+    if (rocketFrameCount >= ROCKET_SPAWN_INTERVAL)
+    {
+        spawnRocket();
+        rocketFrameCount = 0;
+    }
     for (auto it = pipes.begin(); it != pipes.end();)
     {
         (*it)->update(pipeSpeed);
@@ -352,6 +423,16 @@ void Game::update()
         }
         else ++it;
     }
+    for (auto it = rockets.begin(); it != rockets.end();)
+    {
+        (*it)->update(rocketVerticalSpeed, pipeSpeed);
+        if ((*it)->rect.y > SCREEN_HEIGHT || (*it)->rect.x < -ROCKET_SIZE)
+        {
+            delete *it;
+            it = rockets.erase(it);
+        }
+        else ++it;
+    }
     checkCollisions();
     updateScore();
 }
@@ -361,41 +442,96 @@ void Game::render()
     SDL_RenderClear(renderer);
     if (!gameStarted && !levelSelection)
     {
-        SDL_RenderCopy(renderer, backgroundTexture, nullptr, nullptr);
-        SDL_RenderCopy(renderer, flappyBirdTitleTexture, nullptr, &flappyBirdTitleRect);
-        SDL_RenderCopy(renderer, startButtonTexture, nullptr, &startButtonRect);
+        SDL_Rect bgRect = {shakeOffsetX, shakeOffsetY, SCREEN_WIDTH, SCREEN_HEIGHT};
+        SDL_RenderCopy(renderer, backgroundTexture, nullptr, &bgRect);
+        SDL_Rect titleRect = {flappyBirdTitleRect.x + shakeOffsetX, flappyBirdTitleRect.y + shakeOffsetY, flappyBirdTitleRect.w, flappyBirdTitleRect.h};
+        SDL_RenderCopy(renderer, flappyBirdTitleTexture, nullptr, &titleRect);
+        SDL_Rect buttonRect = {startButtonRect.x + shakeOffsetX, startButtonRect.y + shakeOffsetY, startButtonRect.w, startButtonRect.h};
+        SDL_RenderCopy(renderer, startButtonTexture, nullptr, &buttonRect);
     }
     else if (levelSelection)
     {
-        SDL_RenderCopy(renderer, backgroundTexture, nullptr, nullptr);
-        SDL_RenderCopy(renderer, panelTexture, nullptr, &levelPanelRect);
-        SDL_RenderCopy(renderer, level1ButtonTexture, nullptr, &level1ButtonRect);
-        SDL_RenderCopy(renderer, level2ButtonTexture, nullptr, &level2ButtonRect);
-        SDL_RenderCopy(renderer, levelAsianButtonTexture, nullptr, &levelAsianButtonRect);
+        SDL_Rect bgRect = {shakeOffsetX, shakeOffsetY, SCREEN_WIDTH, SCREEN_HEIGHT};
+        SDL_RenderCopy(renderer, backgroundTexture, nullptr, &bgRect);
+        SDL_Rect panelRect = {levelPanelRect.x + shakeOffsetX, levelPanelRect.y + shakeOffsetY, levelPanelRect.w, levelPanelRect.h};
+        SDL_RenderCopy(renderer, panelTexture, nullptr, &panelRect);
+        SDL_Rect level1Rect = {level1ButtonRect.x + shakeOffsetX, level1ButtonRect.y + shakeOffsetY, level1ButtonRect.w, level1ButtonRect.h};
+        SDL_RenderCopy(renderer, level1ButtonTexture, nullptr, &level1Rect);
+        SDL_Rect level2Rect = {level2ButtonRect.x + shakeOffsetX, level2ButtonRect.y + shakeOffsetY, level2ButtonRect.w, level2ButtonRect.h};
+        SDL_RenderCopy(renderer, level2ButtonTexture, nullptr, &level2Rect);
+        SDL_Rect levelAsianRect = {levelAsianButtonRect.x + shakeOffsetX, levelAsianButtonRect.y + shakeOffsetY, levelAsianButtonRect.w, levelAsianButtonRect.h};
+        SDL_RenderCopy(renderer, levelAsianButtonTexture, nullptr, &levelAsianRect);
     }
     else
     {
-        SDL_RenderCopy(renderer, backgroundTexture, nullptr, nullptr);
-        if(!isExploding)
+        SDL_Rect bgRect = {shakeOffsetX, shakeOffsetY, SCREEN_WIDTH, SCREEN_HEIGHT};
+        SDL_RenderCopy(renderer, backgroundTexture, nullptr, &bgRect);
+        if (!isExploding)
         {
+            SDL_Rect birdRect = {bird->rect.x + shakeOffsetX, bird->rect.y + shakeOffsetY, bird->rect.w, bird->rect.h};
+            bird->rect.x += shakeOffsetX;
+            bird->rect.y += shakeOffsetY;
             bird->render(renderer);
+            bird->rect.x -= shakeOffsetX;
+            bird->rect.y -= shakeOffsetY;
         }
-        for (auto pipe : pipes) pipe->render(renderer);
-        for (auto bomb : bombs) bomb->render(renderer);
-        SDL_RenderCopy(renderer, scoreTexture, nullptr, &scoreRect);
+        for (auto pipe : pipes)
+        {
+            SDL_Rect upperRect = {pipe->upperRect.x + shakeOffsetX, pipe->upperRect.y + shakeOffsetY, pipe->upperRect.w, pipe->upperRect.h};
+            SDL_Rect lowerRect = {pipe->lowerRect.x + shakeOffsetX, pipe->lowerRect.y + shakeOffsetY, pipe->lowerRect.w, pipe->lowerRect.h};
+            pipe->upperRect.x += shakeOffsetX;
+            pipe->upperRect.y += shakeOffsetY;
+            pipe->lowerRect.x += shakeOffsetX;
+            pipe->lowerRect.y += shakeOffsetY;
+            pipe->render(renderer);
+            pipe->upperRect.x -= shakeOffsetX;
+            pipe->upperRect.y -= shakeOffsetY;
+            pipe->lowerRect.x -= shakeOffsetX;
+            pipe->lowerRect.y -= shakeOffsetY;
+        }
+        for (auto bomb : bombs)
+        {
+            SDL_Rect bombRect = {bomb->rect.x + shakeOffsetX, bomb->rect.y + shakeOffsetY, bomb->rect.w, bomb->rect.h};
+            bomb->rect.x += shakeOffsetX;
+            bomb->rect.y += shakeOffsetY;
+            bomb->render(renderer);
+            bomb->rect.x -= shakeOffsetX;
+            bomb->rect.y -= shakeOffsetY;
+        }
+        for (auto rocket : rockets)
+        {
+            SDL_Rect rocketRect = {rocket->rect.x + shakeOffsetX, rocket->rect.y + shakeOffsetY, rocket->rect.w, rocket->rect.h};
+            rocket->rect.x += shakeOffsetX;
+            rocket->rect.y += shakeOffsetY;
+            rocket->render(renderer);
+            rocket->rect.x -= shakeOffsetX;
+            rocket->rect.y -= shakeOffsetY;
+        }
+        SDL_Rect scoreRectAdjusted = {scoreRect.x + shakeOffsetX, scoreRect.y + shakeOffsetY, scoreRect.w, scoreRect.h};
+        SDL_RenderCopy(renderer, scoreTexture, nullptr, &scoreRectAdjusted);
         if (isPaused)
         {
             SDL_Surface* pauseSurface = TTF_RenderText_Solid(font, "Paused", {255, 255, 255, 255});
             SDL_Texture* pauseTexture = SDL_CreateTextureFromSurface(renderer, pauseSurface);
-            SDL_Rect pauseRect = {SCREEN_WIDTH / 2 - pauseSurface->w / 2, SCREEN_HEIGHT / 2 - pauseSurface->h / 2, pauseSurface->w, pauseSurface->h};
+            SDL_Rect pauseRect = {SCREEN_WIDTH / 2 - pauseSurface->w / 2 + shakeOffsetX, SCREEN_HEIGHT / 2 - pauseSurface->h / 2 + shakeOffsetY, pauseSurface->w, pauseSurface->h};
             SDL_RenderCopy(renderer, pauseTexture, nullptr, &pauseRect);
             SDL_FreeSurface(pauseSurface);
             SDL_DestroyTexture(pauseTexture);
         }
+        if (isCountingDown && countdownNumber > 0)
+        {
+            std::string countdownText = std::to_string(countdownNumber);
+            SDL_Surface* countdownSurface = TTF_RenderText_Solid(font, countdownText.c_str(), {255, 255, 255, 255});
+            SDL_Texture* countdownTexture = SDL_CreateTextureFromSurface(renderer, countdownSurface);
+            SDL_Rect countdownRect = {SCREEN_WIDTH / 2 - countdownSurface->w / 2 + shakeOffsetX, SCREEN_HEIGHT / 2 - countdownSurface->h / 2 + shakeOffsetY, countdownSurface->w, countdownSurface->h};
+            SDL_RenderCopy(renderer, countdownTexture, nullptr, &countdownRect);
+            SDL_FreeSurface(countdownSurface);
+            SDL_DestroyTexture(countdownTexture);
+        }
     }
     if (isExploding)
     {
-        if(explodeTimer < EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION)
+        if (explodeTimer < EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION)
         {
             explosionFrameCount += explodeTimer - (explosionFrame * EXPLOSION_FRAME_DURATION);
             if (explosionFrameCount >= EXPLOSION_FRAME_DURATION)
@@ -406,17 +542,24 @@ void Game::render()
             if (explosionFrame < EXPLOSION_FRAMES)
             {
                 explosionSrcRect.x = explosionFrame * explosionSrcRect.w;
-                SDL_RenderCopy(renderer, explosionTexture, &explosionSrcRect, &explosionRect);
+                SDL_Rect explosionRectAdjusted = {explosionRect.x + shakeOffsetX, explosionRect.y + shakeOffsetY, explosionRect.w, explosionRect.h};
+                SDL_RenderCopy(renderer, explosionTexture, &explosionSrcRect, &explosionRectAdjusted);
             }
         }
         else
         {
-            SDL_RenderCopy(renderer, backgroundTexture, nullptr, nullptr);
-            SDL_RenderCopy(renderer, panelTexture, nullptr, &gameOverPanelRect);
-            SDL_RenderCopy(renderer, highScoreTexture, nullptr, &highScoreRect);
-            SDL_RenderCopy(renderer, currentScoreTexture, nullptr, &currentScoreRect);
-            SDL_RenderCopy(renderer, replayButtonTexture, nullptr, &replayButtonRect);
-            SDL_RenderCopy(renderer, exitButtonTexture, nullptr, &exitButtonRect);
+            SDL_Rect bgRect = {shakeOffsetX, shakeOffsetY, SCREEN_WIDTH, SCREEN_HEIGHT};
+            SDL_RenderCopy(renderer, backgroundTexture, nullptr, &bgRect);
+            SDL_Rect panelRect = {gameOverPanelRect.x + shakeOffsetX, gameOverPanelRect.y + shakeOffsetY, gameOverPanelRect.w, gameOverPanelRect.h};
+            SDL_RenderCopy(renderer, panelTexture, nullptr, &panelRect);
+            SDL_Rect highScoreRectAdjusted = {highScoreRect.x + shakeOffsetX, highScoreRect.y + shakeOffsetY, highScoreRect.w, highScoreRect.h};
+            SDL_Rect currentScoreRectAdjusted = {currentScoreRect.x + shakeOffsetX, currentScoreRect.y + shakeOffsetY, currentScoreRect.w, currentScoreRect.h};
+            SDL_Rect replayRect = {replayButtonRect.x + shakeOffsetX, replayButtonRect.y + shakeOffsetY, replayButtonRect.w, replayButtonRect.h};
+            SDL_Rect exitRect = {exitButtonRect.x + shakeOffsetX, exitButtonRect.y + shakeOffsetY, exitButtonRect.w, exitButtonRect.h};
+            SDL_RenderCopy(renderer, highScoreTexture, nullptr, &highScoreRectAdjusted);
+            SDL_RenderCopy(renderer, currentScoreTexture, nullptr, &currentScoreRectAdjusted);
+            SDL_RenderCopy(renderer, replayButtonTexture, nullptr, &replayRect);
+            SDL_RenderCopy(renderer, exitButtonTexture, nullptr, &exitRect);
         }
     }
     SDL_RenderPresent(renderer);
@@ -454,6 +597,7 @@ void Game::checkCollisions()
             isExploding = true;
             explosionFrame = 0;
             explosionFrameCount = 0;
+            shakeTimer = 15;
             if (score > highScores[currentLevel - 1])
             {
                 highScores[currentLevel - 1] = score;
@@ -484,6 +628,7 @@ void Game::checkCollisions()
             isExploding = true;
             explosionFrame = 0;
             explosionFrameCount = 0;
+            shakeTimer = 15;
             if (score > highScores[currentLevel - 1])
             {
                 highScores[currentLevel - 1] = score;
@@ -499,6 +644,43 @@ void Game::checkCollisions()
             ++it;
         }
     }
+    for (auto it = rockets.begin(); it != rockets.end();)
+    {
+        if ((*it)->rect.y > SCREEN_HEIGHT || (*it)->rect.x < -ROCKET_SIZE)
+        {
+            delete *it;
+            it = rockets.erase(it);
+            continue;
+        }
+        SDL_Rect rocketRect = (*it)->rect;
+        rocketRect.x += 10;
+        rocketRect.y += 10;
+        rocketRect.w -= 20;
+        rocketRect.h -= 20;
+        if (SDL_HasIntersection(&birdRect, &(*it)->rect))
+        {
+            explosionRect.x = birdRect.x - (explosionRect.w / 2);
+            explosionRect.y = birdRect.y - (explosionRect.h / 2);
+            audioManager->playExplosionSound();
+            isExploding = true;
+            explosionFrame = 0;
+            explosionFrameCount = 0;
+            shakeTimer = 15;
+            if (score > highScores[currentLevel - 1])
+            {
+                highScores[currentLevel - 1] = score;
+            }
+            updateHighScoreTexture();
+            updateCurrentScoreTexture();
+            delete *it;
+            it = rockets.erase(it);
+            return;
+        }
+        else
+        {
+            ++it;
+        }
+    }
     if (birdRect.y < 0 || birdRect.y + birdRect.h > SCREEN_HEIGHT)
     {
         explosionRect.x = birdRect.x - (explosionRect.w / 2);
@@ -507,6 +689,7 @@ void Game::checkCollisions()
         isExploding = true;
         explosionFrame = 0;
         explosionFrameCount = 0;
+        shakeTimer = 15;
         if (score > highScores[currentLevel - 1])
         {
             highScores[currentLevel - 1] = score;
@@ -582,4 +765,9 @@ void Game::updateCurrentScoreTexture()
     currentScoreRect.w = surface->w;
     currentScoreRect.h = surface->h;
     SDL_FreeSurface(surface);
+}
+void Game::spawnRocket()
+{
+    int x = rand() % (SCREEN_WIDTH - ROCKET_SIZE);
+    rockets.push_back(new Rocket(x, rocketTexture, renderer));
 }

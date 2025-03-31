@@ -1,6 +1,7 @@
 #include <iostream>
 #include "AudioManager.h"
 
+// Khởi tạo AudioManager, tải các tệp âm thanh
 AudioManager::AudioManager()
 {
     if(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) < 0)
@@ -22,6 +23,8 @@ AudioManager::AudioManager()
         std::cout << "Failed to load explosion sound! SDL_mixer Error: " << Mix_GetError() << std::endl;
     }
 }
+
+// Giải phóng tài nguyên âm thanh khi hủy đối tượng
 AudioManager::~AudioManager()
 {
     Mix_FreeMusic(backgroundMusic);
@@ -29,6 +32,8 @@ AudioManager::~AudioManager()
     Mix_FreeChunk(explosionSound);
     Mix_CloseAudio();
 }
+
+// Phát nhạc nền lặp lại vô hạn
 void AudioManager::playBackgroundMusic()
 {
     if (backgroundMusic)

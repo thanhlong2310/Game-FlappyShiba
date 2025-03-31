@@ -6,6 +6,7 @@
 #include "Bird.h"
 #include "Pipe.h"
 #include "Bomb.h"
+#include "Rocket.h"
 #include "AudioManager.h"
 #include "Screen.h"
 #include "Constants.h"
@@ -18,16 +19,22 @@ private:
     SDL_Texture* upperPipeTexture;
     SDL_Texture* lowerPipeTexture;
     SDL_Texture* bombTexture;
+    SDL_Texture* rocketTexture;
     Bird* bird;
     std::vector<Pipe*> pipes;
     std::vector<Bomb*> bombs;
+    std::vector<Rocket*> rockets;
     AudioManager* audioManager;
     bool running;
     bool gameStarted;
     bool isExploding;
     bool isPaused;
+    bool isCountingDown;
+    int countdownTimer;
+    int countdownNumber;
     int score;
     int frameCount;
+    int rocketFrameCount;
     int explodeTimer;
     TTF_Font* font;
     SDL_Texture* scoreTexture;
@@ -40,6 +47,7 @@ private:
     int pipeSpeed;
     int bombSpeed;
     int bombSpawnRate;
+    int rocketVerticalSpeed;
     float gravity;
     float jumpForce;
     SDL_Texture* startButtonTexture;
@@ -66,9 +74,14 @@ private:
     SDL_Rect gameOverPanelRect;
     SDL_Texture* exitButtonTexture;
     SDL_Rect exitButtonRect;
+    int shakeTimer;
+    int shakeIntensity;
+    int shakeOffsetX;
+    int shakeOffsetY;
     void updateScoreTexture();
     void spawnPipe();
     void spawnBomb();
+    void spawnRocket();
     void checkCollisions();
     void updateScore();
     void updateHighScoreTexture();

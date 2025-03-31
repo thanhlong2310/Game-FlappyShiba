@@ -40,4 +40,3 @@ void Bird::render(SDL_Renderer* renderer)
 {
     SDL_RenderCopyEx(renderer, texture, nullptr, &rect, angle, nullptr, SDL_FLIP_NONE);
 }
-

@@ -54,6 +54,8 @@
 		<Unit filename="Game.h" />
 		<Unit filename="Pipe.cpp" />
 		<Unit filename="Pipe.h" />
+		<Unit filename="Rocket.cpp" />
+		<Unit filename="Rocket.h" />
 		<Unit filename="Screen.cpp" />
 		<Unit filename="Screen.h" />
 		<Unit filename="main.cpp" />
