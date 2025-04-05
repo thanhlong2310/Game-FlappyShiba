@@ -3,6 +3,7 @@
 #include "Screen.h"
 #include "Constants.h"
 
+// Khởi tạo màn hình với texture từ đường dẫn ảnh
 Screen::Screen(const char* imagePath, SDL_Renderer* renderer)
 {
     SDL_Surface* surface = IMG_Load(imagePath);
@@ -14,10 +15,14 @@ Screen::Screen(const char* imagePath, SDL_Renderer* renderer)
     SDL_FreeSurface(surface);
     rect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 }
+
+// Giải phóng texture khi hủy đối tượng Screen
 Screen::~Screen()
 {
     SDL_DestroyTexture(texture);
 }
+
+// Vẽ màn hình lên renderer
 void Screen::render(SDL_Renderer* renderer)
 {
     SDL_RenderCopy(renderer, texture, nullptr, &rect);

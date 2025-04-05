@@ -4,6 +4,7 @@
 #include <SDL_ttf.h>
 #include "Game.h"
 
+// Hàm main - điểm bắt đầu của chương trình
 int main(int argc, char* argv[])
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
@@ -35,6 +36,8 @@ int main(int argc, char* argv[])
     }
     Game game(renderer);
     game.run();
+
+    // Dọn dẹp tài nguyên
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     TTF_Quit();

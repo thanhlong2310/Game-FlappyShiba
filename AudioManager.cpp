@@ -41,10 +41,14 @@ void AudioManager::playBackgroundMusic()
         Mix_PlayMusic(backgroundMusic, -1);
     }
 }
+
+// Dừng phát nhạc nền
 void AudioManager::stopBackgroundMusic()
 {
     Mix_HaltMusic();
 }
+
+// Phát âm thanh khi nhảy
 void AudioManager::playJumpSound()
 {
     if (jumpSound)
@@ -52,6 +56,8 @@ void AudioManager::playJumpSound()
         Mix_PlayChannel(-1, jumpSound, 0);
     }
 }
+
+// Phát âm thanh khi va chạm nổ
 void AudioManager::playExplosionSound()
 {
     if (explosionSound)

@@ -454,41 +454,41 @@
 	"begin_code.h"
 	"close_code.h"
 
-1743355843 source:e:\codeblock\flappyshiba\audiomanager.cpp
+1743441534 source:e:\codeblock\flappyshiba\audiomanager.cpp
 	<iostream>
 	"AudioManager.h"
 
-1743345308 source:e:\codeblock\flappyshiba\bird.cpp
+1743787311 source:e:\codeblock\flappyshiba\bird.cpp
 	<iostream>
 	<SDL_image.h>
 	"Bird.h"
 	"Constants.h"
 
-1743345308 source:e:\codeblock\flappyshiba\bomb.cpp
+1743787311 source:e:\codeblock\flappyshiba\bomb.cpp
 	<iostream>
 	<SDL_image.h>
 	"Bomb.h"
 	"Constants.h"
 
-1743345308 source:e:\codeblock\flappyshiba\game.cpp
+1743787311 source:e:\codeblock\flappyshiba\game.cpp
 	<iostream>
 	<SDL_image.h>
 	"Game.h"
 
-1743345308 source:e:\codeblock\flappyshiba\pipe.cpp
+1743610096 source:e:\codeblock\flappyshiba\pipe.cpp
 	<SDL_image.h>
 	<iostream>
 	<cstdlib>
 	"Pipe.h"
 	"Constants.h"
 
-1743345308 source:e:\codeblock\flappyshiba\screen.cpp
+1743486477 source:e:\codeblock\flappyshiba\screen.cpp
 	<iostream>
 	<SDL_image.h>
 	"Screen.h"
 	"Constants.h"
 
-1742261684 e:\codeblock\flappyshiba\audiomanager.h
+1743441540 e:\codeblock\flappyshiba\audiomanager.h
 	<SDL_mixer.h>
 
 1738962281 c:\users\admin\downloads\sdl2_mixer-devel-2.8.1-mingw\sdl2_mixer-2.8.1\x86_64-w64-mingw32\include\sdl2\sdl_mixer.h
@@ -500,15 +500,15 @@
 	"begin_code.h"
 	"close_code.h"
 
-1743179256 e:\codeblock\flappyshiba\bird.h
+1743787311 e:\codeblock\flappyshiba\bird.h
 	<SDL.h>
 
-1743311451 e:\codeblock\flappyshiba\constants.h
+1743508442 e:\codeblock\flappyshiba\constants.h
 
-1742832664 e:\codeblock\flappyshiba\bomb.h
+1743787311 e:\codeblock\flappyshiba\bomb.h
 	<SDL.h>
 
-1743345308 e:\codeblock\flappyshiba\game.h
+1743777113 e:\codeblock\flappyshiba\game.h
 	<vector>
 	<SDL.h>
 	<SDL_ttf.h>
@@ -517,13 +517,12 @@
 	"Bomb.h"
 	"Rocket.h"
 	"AudioManager.h"
-	"Screen.h"
 	"Constants.h"
 
-1743221301 e:\codeblock\flappyshiba\pipe.h
+1743597810 e:\codeblock\flappyshiba\pipe.h
 	<SDL.h>
 
-1742371773 e:\codeblock\flappyshiba\screen.h
+1743486477 e:\codeblock\flappyshiba\screen.h
 	<SDL.h>
 
 1742619331 c:\users\admin\downloads\sdl2_ttf-devel-2.24.0-mingw\sdl2_ttf-2.24.0\x86_64-w64-mingw32\include\sdl2\sdl_ttf.h
@@ -531,10 +530,10 @@
 	"begin_code.h"
 	"close_code.h"
 
-1743307601 e:\codeblock\flappyshiba\rocket.h
+1743787311 e:\codeblock\flappyshiba\rocket.h
 	<SDL.h>
 
-1743345308 source:e:\codeblock\flappyshiba\rocket.cpp
+1743787311 source:e:\codeblock\flappyshiba\rocket.cpp
 	<iostream>
 	<SDL_image.h>
 	"Rocket.h"

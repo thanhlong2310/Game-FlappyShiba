@@ -4,10 +4,10 @@
 #include "Pipe.h"
 #include "Constants.h"
 
+// Khởi tạo cặp ống với vị trí và texture
 Pipe::Pipe(int x, SDL_Texture* upperTex, SDL_Texture* lowerTex, SDL_Renderer* renderer)
 {
     const int PIPE_WIDTH = 100;
-    const int PIPE_HEIGHT = 300;
     int gapY = rand() % (SCREEN_HEIGHT - PIPE_GAP - 100) + 50;
     upperRect = {x, 0, PIPE_WIDTH, gapY};
     lowerRect = {x, gapY + PIPE_GAP, PIPE_WIDTH, SCREEN_HEIGHT - (gapY + PIPE_GAP)};
@@ -15,11 +15,15 @@ Pipe::Pipe(int x, SDL_Texture* upperTex, SDL_Texture* lowerTex, SDL_Renderer* re
     upperTexture = upperTex;
     lowerTexture = lowerTex;
 }
+
+// Cập nhật vị trí của cặp ống, di chuyển sang trái
 void Pipe::update(int speed)
 {
     upperRect.x -= speed;
     lowerRect.x -= speed;
 }
+
+// Vẽ cặp ống lên màn hình
 void Pipe::render(SDL_Renderer* renderer)
 {
     const int PIPE_HEIGHT = 300;
