@@ -32,7 +32,8 @@ void Rocket::update(int fallSpeed, int moveSpeed)
 }
 
 // Vẽ Rocket lên màn hình
-void Rocket::render(SDL_Renderer* renderer)
+void Rocket::render(SDL_Renderer* renderer, int shakeOffsetX, int shakeOffsetY)
 {
-    SDL_RenderCopy(renderer, texture, nullptr, &rect);
+    SDL_Rect rectAdjusted = {rect.x + shakeOffsetX, rect.y + shakeOffsetY, rect.w, rect.h};
+    SDL_RenderCopy(renderer, texture, nullptr, &rectAdjusted);
 }

@@ -56,8 +56,6 @@
 		<Unit filename="Pipe.h" />
 		<Unit filename="Rocket.cpp" />
 		<Unit filename="Rocket.h" />
-		<Unit filename="Screen.cpp" />
-		<Unit filename="Screen.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

@@ -12,6 +12,6 @@ public:
 
     Bomb(int x, int y, SDL_Texture* tex, SDL_Renderer* renderer); // Hàm khởi tạo
     void update(int speed);              // Cập nhật vị trí của bom
-    void render(SDL_Renderer* renderer); // Vẽ bom lên màn hình
+    void render(SDL_Renderer* renderer, int shakeOffsetX, int shakeOffsetY); // Vẽ bom lên màn hình
 };
 #endif

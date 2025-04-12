@@ -24,11 +24,13 @@ void Pipe::update(int speed)
 }
 
 // Vẽ cặp ống lên màn hình
-void Pipe::render(SDL_Renderer* renderer)
+void Pipe::render(SDL_Renderer* renderer, int shakeOffsetX, int shakeOffsetY)
 {
     const int PIPE_HEIGHT = 300;
     SDL_Rect upperSrcRect = {0, PIPE_HEIGHT - upperRect.h, upperRect.w, upperRect.h};
-    SDL_RenderCopy(renderer, upperTexture, &upperSrcRect, &upperRect);
     SDL_Rect lowerSrcRect = {0, 0, lowerRect.w, lowerRect.h};
-    SDL_RenderCopy(renderer, lowerTexture, &lowerSrcRect, &lowerRect);
+    SDL_Rect upperRectAdjusted = {upperRect.x + shakeOffsetX, upperRect.y + shakeOffsetY, upperRect.w, upperRect.h};
+    SDL_Rect lowerRectAdjusted = {lowerRect.x + shakeOffsetX, lowerRect.y + shakeOffsetY, lowerRect.w, lowerRect.h};
+    SDL_RenderCopy(renderer, upperTexture, &upperSrcRect, &upperRectAdjusted);
+    SDL_RenderCopy(renderer, lowerTexture, &lowerSrcRect, &lowerRectAdjusted);
 }

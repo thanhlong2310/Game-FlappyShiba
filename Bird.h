@@ -2,7 +2,7 @@
 #define BIRD_H
 #include <SDL.h>
 
-// Lớp đại diện cho chú chim
+// Lớp đại diện cho shiba
 class Bird
 {
 public:

@@ -8,10 +8,10 @@ Bird::Bird(SDL_Renderer* renderer)
 {
     rect = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2, 50, 50};
     collisionRect = rect;
-    collisionRect.x += rect.w * 0.1;
-    collisionRect.y += rect.h * 0.1;
-    collisionRect.w *= 0.8;
-    collisionRect.h *= 0.8;
+    collisionRect.w *= 0.85;
+    collisionRect.h *= 0.85;
+    collisionRect.x += (rect.w - collisionRect.w) / 2;
+    collisionRect.y += (rect.h - collisionRect.h) / 2;
 
     velocity = 0.0f;
     angle = 0.0;
@@ -41,10 +41,10 @@ void Bird::update()
         angle = BIRD_ANGLE_DOWN;
     }
 
-    collisionRect.x = rect.x + (rect.w * 0.1);
-    collisionRect.y = rect.y + (rect.h * 0.1);
-    collisionRect.w = rect.w * 0.8;
-    collisionRect.h = rect.h * 0.8;
+    collisionRect.w = rect.w * 0.85;
+    collisionRect.h = rect.h * 0.85;
+    collisionRect.x = rect.x + (rect.w - collisionRect.w) / 2;
+    collisionRect.y = rect.y + (rect.h - collisionRect.h) / 2;
 }
 
 // Thực hiện hành động nhảy, đặt lại vận tốc và góc

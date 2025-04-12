@@ -14,6 +14,6 @@ public:
 
     Pipe(int x, SDL_Texture* upperTex, SDL_Texture* lowerTex, SDL_Renderer* renderer); // Hàm khởi tạo
     void update(int speed);              // Cập nhật vị trí của ống
-    void render(SDL_Renderer* renderer); // Vẽ ống lên màn hình
+    void render(SDL_Renderer* renderer, int shakeOffsetX, int shakeOffsetY); // Vẽ ống lên màn hình
 };
 #endif

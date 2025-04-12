@@ -12,6 +12,6 @@ public:
 
     Rocket(int x, SDL_Texture* tex, SDL_Renderer* renderer); // Hàm khởi tạo
     void update(int fallSpeed, int moveSpeed); // Cập nhật vị trí của tên lửa
-    void render(SDL_Renderer* renderer);       // Vẽ tên lửa lên màn hình
+    void render(SDL_Renderer* renderer, int shakeOffsetX, int shakeOffsetY); // Vẽ tên lửa lên màn hình
 };
 #endif

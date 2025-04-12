@@ -2,55 +2,6 @@
 #include <SDL_image.h>
 #include "Game.h"
 
-// Hàm hỗ trợ chuyển đổi chuỗi UTF-8 sang UTF-16
-static Uint16* utf8_to_utf16(const char* utf8_str)
-{
-    int len = 0;
-    while (utf8_str[len] != '\0') len++;
-
-    // Tính số ký tự UTF-16 cần thiết
-    int utf16_len = 0;
-    for (int i = 0; i < len;)
-    {
-        unsigned char c = utf8_str[i];
-        if (c <= 0x7F) i += 1;           // 1 byte
-        else if ((c & 0xE0) == 0xC0) i += 2; // 2 bytes
-        else if ((c & 0xF0) == 0xE0) i += 3; // 3 bytes
-        else if ((c & 0xF8) == 0xF0) i += 4; // 4 bytes
-        utf16_len++;
-    }
-
-    // Cấp phát bộ nhớ cho chuỗi UTF-16
-    Uint16* utf16_str = new Uint16[utf16_len + 1];
-    int pos = 0;
-    for (int i = 0; i < len;)
-    {
-        unsigned char c = utf8_str[i];
-        if (c <= 0x7F) // 1 byte (ASCII)
-        {
-            utf16_str[pos++] = c;
-            i += 1;
-        }
-        else if ((c & 0xE0) == 0xC0) // 2 bytes
-        {
-            utf16_str[pos++] = ((c & 0x1F) << 6) | (utf8_str[i + 1] & 0x3F);
-            i += 2;
-        }
-        else if ((c & 0xF0) == 0xE0) // 3 bytes
-        {
-            utf16_str[pos++] = ((c & 0x0F) << 12) | ((utf8_str[i + 1] & 0x3F) << 6) | (utf8_str[i + 2] & 0x3F);
-            i += 3;
-        }
-        else if ((c & 0xF8) == 0xF0) // 4 bytes (chuyển thành ký tự thay thế vì SDL_ttf không hỗ trợ đầy đủ)
-        {
-            utf16_str[pos++] = 0xFFFD; // Ký tự thay thế
-            i += 4;
-        }
-    }
-    utf16_str[pos] = 0; // Kết thúc chuỗi
-    return utf16_str;
-}
-
 // Khởi tạo trò chơi, tải các tài nguyên cần thiết
 Game::Game(SDL_Renderer* rend) : renderer(rend)
 {
@@ -251,39 +202,33 @@ void Game::handleEvents()
             int y = event.button.y;
             if (!gameStarted && !levelSelection)
             {
-                if (x >= startButtonRect.x && x <= startButtonRect.x + startButtonRect.w &&
-                    y >= startButtonRect.y && y <= startButtonRect.y + startButtonRect.h)
+                if (x >= startButtonRect.x && x <= startButtonRect.x + startButtonRect.w && y >= startButtonRect.y && y <= startButtonRect.y + startButtonRect.h)
                 {
                     levelSelection = true;
                 }
             }
             else if (levelSelection)
             {
-                if (x >= level1ButtonRect.x && x <= level1ButtonRect.x + level1ButtonRect.w &&
-                    y >= level1ButtonRect.y && y <= level1ButtonRect.y + level1ButtonRect.h)
+                if (x >= level1ButtonRect.x && x <= level1ButtonRect.x + level1ButtonRect.w && y >= level1ButtonRect.y && y <= level1ButtonRect.y + level1ButtonRect.h)
                 {
                     startLevel(1, 0.2f, -6.0f, PIPE_SPEED, BOMB_SPEED, 150, ROCKET_SPEED);
                 }
-                else if (x >= level2ButtonRect.x && x <= level2ButtonRect.x + level2ButtonRect.w &&
-                         y >= level2ButtonRect.y && y <= level2ButtonRect.y + level2ButtonRect.h)
+                else if (x >= level2ButtonRect.x && x <= level2ButtonRect.x + level2ButtonRect.w && y >= level2ButtonRect.y && y <= level2ButtonRect.y + level2ButtonRect.h)
                 {
                     startLevel(2, 0.2f * 1.5f, -6.0f * 1.5f, PIPE_SPEED * 1.5f, BOMB_SPEED * 1.5f, 90, ROCKET_SPEED * 1.5f);
                 }
-                else if (x >= levelAsianButtonRect.x && x <= levelAsianButtonRect.x + levelAsianButtonRect.w &&
-                         y >= levelAsianButtonRect.y && y <= levelAsianButtonRect.y + levelAsianButtonRect.h)
+                else if (x >= levelAsianButtonRect.x && x <= levelAsianButtonRect.x + levelAsianButtonRect.w && y >= levelAsianButtonRect.y && y <= levelAsianButtonRect.y + levelAsianButtonRect.h)
                 {
                     startLevel(3, 0.2f * 3, -6.0f * 3, PIPE_SPEED * 3, BOMB_SPEED * 3, 60, ROCKET_SPEED * 3);
                 }
             }
             else if (isExploding && explodeTimer >= EXPLOSION_FRAMES * EXPLOSION_FRAME_DURATION)
             {
-                if (x >= replayButtonRect.x && x <= replayButtonRect.x + replayButtonRect.w &&
-                    y >= replayButtonRect.y && y <= replayButtonRect.y + replayButtonRect.h)
+                if (x >= replayButtonRect.x && x <= replayButtonRect.x + replayButtonRect.w && y >= replayButtonRect.y && y <= replayButtonRect.y + replayButtonRect.h)
                 {
                     resetGame();
                 }
-                else if (x >= exitButtonRect.x && x <= exitButtonRect.x + exitButtonRect.w &&
-                         y >= exitButtonRect.y && y <= exitButtonRect.y + exitButtonRect.h)
+                else if (x >= exitButtonRect.x && x <= exitButtonRect.x + exitButtonRect.w && y >= exitButtonRect.y && y <= exitButtonRect.y + exitButtonRect.h)
                 {
                     gameStarted = false;
                     levelSelection = true;
@@ -430,18 +375,16 @@ void Game::render()
     else
     {
         if (!isExploding) bird->render(renderer);
-        for (auto pipe : pipes) pipe->render(renderer);
-        for (auto bomb : bombs) bomb->render(renderer);
-        for (auto rocket : rockets) rocket->render(renderer);
+        for (auto pipe : pipes) pipe->render(renderer, shakeOffsetX, shakeOffsetY);
+        for (auto bomb : bombs) bomb->render(renderer, shakeOffsetX, shakeOffsetY);
+        for (auto rocket : rockets) rocket->render(renderer, shakeOffsetX, shakeOffsetY);
         SDL_Rect scoreRectAdjusted = {scoreRect.x + shakeOffsetX, scoreRect.y + shakeOffsetY, scoreRect.w, scoreRect.h};
         SDL_RenderCopy(renderer, scoreTexture, nullptr, &scoreRectAdjusted);
 
         if (isPaused)
         {
-            const char* pauseText = "Tạm dừng";
-            Uint16* pauseTextUtf16 = utf8_to_utf16(pauseText);
-            SDL_Surface* pauseSurface = TTF_RenderUNICODE_Solid(font, pauseTextUtf16, {255, 255, 255, 255});
-            delete[] pauseTextUtf16;
+            const char* pauseText = "Paused";
+            SDL_Surface* pauseSurface = TTF_RenderText_Solid(font, pauseText, {255, 255, 255, 255});
             if (!pauseSurface)
             {
                 std::cout << "Failed to render pause text! TTF_Error: " << TTF_GetError() << std::endl;
@@ -485,12 +428,12 @@ void Game::render()
         }
         else if (isExploding)
         {
-            SDL_Rect panelRect = {gameOverPanelRect.x + shakeOffsetX, gameOverPanelRect.y + shakeOffsetY, gameOverPanelRect.w, gameOverPanelRect.h};
+            SDL_Rect panelRect = {gameOverPanelRect.x, gameOverPanelRect.y, gameOverPanelRect.w, gameOverPanelRect.h};
             SDL_RenderCopy(renderer, panelTexture, nullptr, &panelRect);
-            SDL_Rect highScoreRectAdjusted = {highScoreRect.x + shakeOffsetX, highScoreRect.y + shakeOffsetY, highScoreRect.w, highScoreRect.h};
-            SDL_Rect currentScoreRectAdjusted = {currentScoreRect.x + shakeOffsetX, currentScoreRect.y + shakeOffsetY, currentScoreRect.w, currentScoreRect.h};
-            SDL_Rect replayRect = {replayButtonRect.x + shakeOffsetX, replayButtonRect.y + shakeOffsetY, replayButtonRect.w, replayButtonRect.h};
-            SDL_Rect exitRect = {exitButtonRect.x + shakeOffsetX, exitButtonRect.y + shakeOffsetY, exitButtonRect.w, exitButtonRect.h};
+            SDL_Rect highScoreRectAdjusted = {highScoreRect.x, highScoreRect.y, highScoreRect.w, highScoreRect.h};
+            SDL_Rect currentScoreRectAdjusted = {currentScoreRect.x, currentScoreRect.y, currentScoreRect.w, currentScoreRect.h};
+            SDL_Rect replayRect = {replayButtonRect.x, replayButtonRect.y, replayButtonRect.w, replayButtonRect.h};
+            SDL_Rect exitRect = {exitButtonRect.x, exitButtonRect.y, exitButtonRect.w, exitButtonRect.h};
             SDL_RenderCopy(renderer, highScoreTexture, nullptr, &highScoreRectAdjusted);
             SDL_RenderCopy(renderer, currentScoreTexture, nullptr, &currentScoreRectAdjusted);
             SDL_RenderCopy(renderer, replayButtonTexture, nullptr, &replayRect);
@@ -616,10 +559,8 @@ void Game::updateScore()
 void Game::updateScoreTexture()
 {
     if (scoreTexture) SDL_DestroyTexture(scoreTexture);
-    std::string scoreText = "Điểm: " + std::to_string(score);
-    Uint16* scoreTextUtf16 = utf8_to_utf16(scoreText.c_str());
-    SDL_Surface* surface = TTF_RenderUNICODE_Solid(font, scoreTextUtf16, {255, 255, 255, 255});
-    delete[] scoreTextUtf16;
+    std::string scoreText = "Score: " + std::to_string(score);
+    SDL_Surface* surface = TTF_RenderText_Solid(font, scoreText.c_str(), {255, 255, 255, 255});
     if (!surface)
     {
         std::cout << "Failed to create score surface! TTF_Error: " << TTF_GetError() << std::endl;
@@ -635,10 +576,8 @@ void Game::updateScoreTexture()
 void Game::updateHighScoreTexture()
 {
     if (highScoreTexture) SDL_DestroyTexture(highScoreTexture);
-    std::string highScoreText = "Điểm cao nhất: " + std::to_string(highScores[currentLevel - 1]);
-    Uint16* highScoreTextUtf16 = utf8_to_utf16(highScoreText.c_str());
-    SDL_Surface* highScoreSurface = TTF_RenderUNICODE_Solid(font, highScoreTextUtf16, {255, 255, 255, 255});
-    delete[] highScoreTextUtf16;
+    std::string highScoreText = "High Score: " + std::to_string(highScores[currentLevel - 1]);
+    SDL_Surface* highScoreSurface = TTF_RenderText_Solid(font, highScoreText.c_str(), {255, 255, 255, 255});
     if (!highScoreSurface)
     {
         std::cout << "Failed to create high score surface! TTF_Error: " << TTF_GetError() << std::endl;
@@ -654,10 +593,8 @@ void Game::updateHighScoreTexture()
 void Game::updateCurrentScoreTexture()
 {
     if (currentScoreTexture) SDL_DestroyTexture(currentScoreTexture);
-    std::string scoreText = "Điểm: " + std::to_string(score);
-    Uint16* scoreTextUtf16 = utf8_to_utf16(scoreText.c_str());
-    SDL_Surface* surface = TTF_RenderUNICODE_Solid(font, scoreTextUtf16, {255, 255, 255, 255});
-    delete[] scoreTextUtf16;
+    std::string scoreText = "Score: " + std::to_string(score);
+    SDL_Surface* surface = TTF_RenderText_Solid(font, scoreText.c_str(), {255, 255, 255, 255});
     if (!surface)
     {
         std::cout << "Failed to create current score surface! TTF_Error: " << TTF_GetError() << std::endl;
